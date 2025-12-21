@@ -38,6 +38,16 @@ pip install -r requirements.txt
 ```
 
 3. Run the application:
+
+**For Development (with debug mode):**
+```bash
+export FLASK_ENV=development  # On Linux/Mac
+# OR
+set FLASK_ENV=development     # On Windows
+python app.py
+```
+
+**For Production (secure mode):**
 ```bash
 python app.py
 ```
@@ -46,6 +56,8 @@ python app.py
 ```
 http://localhost:5000
 ```
+
+**Security Note:** Debug mode is disabled by default for security. Only enable it in development environments by setting the `FLASK_ENV=development` environment variable.
 
 ## Usage
 
