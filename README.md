@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SAMEERA RICE - Inventory Management System (Gaming Mod UI)
 
 A modern, production-ready React application for rice and paddy stock inventory management with gaming aesthetics and glass morphism design.
@@ -176,3 +177,7 @@ For issues or questions, please create an issue in the repository.
 ---
 
 **Built with ❤️ using React + Gaming Aesthetics**
+=======
+# Rice_Mill
+SAMEERA_RICE
+>>>>>>> 85265342cd7c9e13c135aad97fdc19373aa45a07
