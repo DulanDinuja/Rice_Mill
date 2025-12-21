@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SAMEERA RICE MILL{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h2>Rice Mill Management Dashboard</h2>
+    <div class="dashboard-cards">
+        <div class="card">
+            <h3>Inventory</h3>
+            <p>Manage raw materials and finished products</p>
+            <a href="{{ url_for('inventory') }}" class="btn">View Inventory</a>
+        </div>
+        <div class="card">
+            <h3>Orders</h3>
+            <p>Track customer orders and deliveries</p>
+            <a href="{{ url_for('orders') }}" class="btn">View Orders</a>
+        </div>
+        <div class="card">
+            <h3>Production</h3>
+            <p>Record production activities</p>
+            <a href="{{ url_for('production') }}" class="btn">View Production</a>
+        </div>
+        <div class="card">
+            <h3>Sales</h3>
+            <p>Manage sales transactions</p>
+            <a href="{{ url_for('sales') }}" class="btn">View Sales</a>
+        </div>
+    </div>
+    <div class="info-section">
+        <h3>About SAMEERA RICE MILL</h3>
+        <p>Welcome to the Rice Mill Management System. This application helps you manage all aspects of your rice mill operations including inventory tracking, order management, production records, and sales transactions.</p>
+    </div>
+</div>
+{% endblock %}

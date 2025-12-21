@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Production - SAMEERA RICE MILL{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Production Records</h2>
+    <button class="btn" onclick="showAddForm()">Add Production Record</button>
+</div>
+
+<div id="addForm" class="form-container" style="display:none;">
+    <h3>Add Production Record</h3>
+    <form onsubmit="addProduction(event)">
+        <input type="text" id="raw_material" placeholder="Raw Material" required>
+        <input type="number" id="raw_quantity" placeholder="Raw Quantity" step="0.01" required>
+        <input type="text" id="finished_product" placeholder="Finished Product" required>
+        <input type="number" id="finished_quantity" placeholder="Finished Quantity" step="0.01" required>
+        <button type="submit" class="btn">Add Record</button>
+        <button type="button" class="btn btn-secondary" onclick="hideAddForm()">Cancel</button>
+    </form>
+</div>
+
+<div class="table-container">
+    <table id="productionTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Raw Material</th>
+                <th>Raw Quantity</th>
+                <th>Finished Product</th>
+                <th>Finished Quantity</th>
+                <th>Production Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="productionBody">
+        </tbody>
+    </table>
+</div>
+
+<script>
+function showAddForm() {
+    document.getElementById('addForm').style.display = 'block';
+}
+
+function hideAddForm() {
+    document.getElementById('addForm').style.display = 'none';
+}
+
+async function loadProduction() {
+    try {
+        const response = await fetch('/api/production');
+        const data = await response.json();
+        const tbody = document.getElementById('productionBody');
+        tbody.innerHTML = '';
+        data.forEach(record => {
+            const row = `
+                <tr>
+                    <td>${record.id}</td>
+                    <td>${record.raw_material}</td>
+                    <td>${record.raw_quantity}</td>
+                    <td>${record.finished_product}</td>
+                    <td>${record.finished_quantity}</td>
+                    <td>${record.production_date}</td>
+                    <td>
+                        <button class="btn btn-small" onclick="deleteProduction(${record.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    } catch (error) {
+        console.error('Error loading production:', error);
+    }
+}
+
+async function addProduction(event) {
+    event.preventDefault();
+    const data = {
+        raw_material: document.getElementById('raw_material').value,
+        raw_quantity: parseFloat(document.getElementById('raw_quantity').value),
+        finished_product: document.getElementById('finished_product').value,
+        finished_quantity: parseFloat(document.getElementById('finished_quantity').value)
+    };
+    
+    try {
+        const response = await fetch('/api/production', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        if (response.ok) {
+            hideAddForm();
+            document.querySelector('form').reset();
+            loadProduction();
+        }
+    } catch (error) {
+        console.error('Error adding production:', error);
+    }
+}
+
+async function deleteProduction(id) {
+    if (confirm('Are you sure you want to delete this record?')) {
+        try {
+            const response = await fetch(`/api/production/${id}`, {method: 'DELETE'});
+            if (response.ok) {
+                loadProduction();
+            }
+        } catch (error) {
+            console.error('Error deleting production:', error);
+        }
+    }
+}
+
+loadProduction();
+</script>
+{% endblock %}

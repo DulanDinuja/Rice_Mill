@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory - SAMEERA RICE MILL{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Inventory Management</h2>
+    <button class="btn" onclick="showAddForm()">Add New Item</button>
+</div>
+
+<div id="addForm" class="form-container" style="display:none;">
+    <h3>Add Inventory Item</h3>
+    <form onsubmit="addItem(event)">
+        <input type="text" id="item_name" placeholder="Item Name" required>
+        <input type="number" id="quantity" placeholder="Quantity" step="0.01" required>
+        <input type="text" id="unit" placeholder="Unit (kg, bags, tons)" required>
+        <button type="submit" class="btn">Add Item</button>
+        <button type="button" class="btn btn-secondary" onclick="hideAddForm()">Cancel</button>
+    </form>
+</div>
+
+<div class="table-container">
+    <table id="inventoryTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Item Name</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Date Added</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="inventoryBody">
+        </tbody>
+    </table>
+</div>
+
+<script>
+function showAddForm() {
+    document.getElementById('addForm').style.display = 'block';
+}
+
+function hideAddForm() {
+    document.getElementById('addForm').style.display = 'none';
+}
+
+async function loadInventory() {
+    try {
+        const response = await fetch('/api/inventory');
+        const data = await response.json();
+        const tbody = document.getElementById('inventoryBody');
+        tbody.innerHTML = '';
+        data.forEach(item => {
+            const row = `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.item_name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.unit}</td>
+                    <td>${item.date_added}</td>
+                    <td>
+                        <button class="btn btn-small" onclick="deleteItem(${item.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    } catch (error) {
+        console.error('Error loading inventory:', error);
+    }
+}
+
+async function addItem(event) {
+    event.preventDefault();
+    const data = {
+        item_name: document.getElementById('item_name').value,
+        quantity: parseFloat(document.getElementById('quantity').value),
+        unit: document.getElementById('unit').value
+    };
+    
+    try {
+        const response = await fetch('/api/inventory', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        if (response.ok) {
+            hideAddForm();
+            document.querySelector('form').reset();
+            loadInventory();
+        }
+    } catch (error) {
+        console.error('Error adding item:', error);
+    }
+}
+
+async function deleteItem(id) {
+    if (confirm('Are you sure you want to delete this item?')) {
+        try {
+            const response = await fetch(`/api/inventory/${id}`, {method: 'DELETE'});
+            if (response.ok) {
+                loadInventory();
+            }
+        } catch (error) {
+            console.error('Error deleting item:', error);
+        }
+    }
+}
+
+loadInventory();
+</script>
+{% endblock %}

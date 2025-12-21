@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Sales - SAMEERA RICE MILL{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Sales Records</h2>
+    <button class="btn" onclick="showAddForm()">Add New Sale</button>
+</div>
+
+<div id="addForm" class="form-container" style="display:none;">
+    <h3>Add Sale Record</h3>
+    <form onsubmit="addSale(event)">
+        <input type="text" id="customer_name" placeholder="Customer Name" required>
+        <input type="text" id="product" placeholder="Product" required>
+        <input type="number" id="quantity" placeholder="Quantity" step="0.01" required>
+        <input type="number" id="price_per_unit" placeholder="Price per Unit" step="0.01" required>
+        <button type="submit" class="btn">Add Sale</button>
+        <button type="button" class="btn btn-secondary" onclick="hideAddForm()">Cancel</button>
+    </form>
+</div>
+
+<div class="table-container">
+    <table id="salesTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price/Unit</th>
+                <th>Total Amount</th>
+                <th>Sale Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="salesBody">
+        </tbody>
+    </table>
+</div>
+
+<script>
+function showAddForm() {
+    document.getElementById('addForm').style.display = 'block';
+}
+
+function hideAddForm() {
+    document.getElementById('addForm').style.display = 'none';
+}
+
+async function loadSales() {
+    try {
+        const response = await fetch('/api/sales');
+        const data = await response.json();
+        const tbody = document.getElementById('salesBody');
+        tbody.innerHTML = '';
+        data.forEach(sale => {
+            const row = `
+                <tr>
+                    <td>${sale.id}</td>
+                    <td>${sale.customer_name}</td>
+                    <td>${sale.product}</td>
+                    <td>${sale.quantity}</td>
+                    <td>$${sale.price_per_unit.toFixed(2)}</td>
+                    <td>$${sale.total_amount.toFixed(2)}</td>
+                    <td>${sale.sale_date}</td>
+                    <td>
+                        <button class="btn btn-small" onclick="deleteSale(${sale.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    } catch (error) {
+        console.error('Error loading sales:', error);
+    }
+}
+
+async function addSale(event) {
+    event.preventDefault();
+    const quantity = parseFloat(document.getElementById('quantity').value);
+    const price_per_unit = parseFloat(document.getElementById('price_per_unit').value);
+    const data = {
+        customer_name: document.getElementById('customer_name').value,
+        product: document.getElementById('product').value,
+        quantity: quantity,
+        price_per_unit: price_per_unit,
+        total_amount: quantity * price_per_unit
+    };
+    
+    try {
+        const response = await fetch('/api/sales', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        if (response.ok) {
+            hideAddForm();
+            document.querySelector('form').reset();
+            loadSales();
+        }
+    } catch (error) {
+        console.error('Error adding sale:', error);
+    }
+}
+
+async function deleteSale(id) {
+    if (confirm('Are you sure you want to delete this sale?')) {
+        try {
+            const response = await fetch(`/api/sales/${id}`, {method: 'DELETE'});
+            if (response.ok) {
+                loadSales();
+            }
+        } catch (error) {
+            console.error('Error deleting sale:', error);
+        }
+    }
+}
+
+loadSales();
+</script>
+{% endblock %}
