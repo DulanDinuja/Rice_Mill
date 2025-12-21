@@ -59,24 +59,21 @@ async function loadOrders() {
         const response = await fetch('/api/orders');
         const data = await response.json();
         const tbody = document.getElementById('ordersBody');
-        tbody.innerHTML = '';
-        data.forEach(order => {
-            const row = `
-                <tr>
-                    <td>${order.id}</td>
-                    <td>${order.customer_name}</td>
-                    <td>${order.product}</td>
-                    <td>${order.quantity}</td>
-                    <td>$${order.total_price.toFixed(2)}</td>
-                    <td><span class="status-${order.status.toLowerCase()}">${order.status}</span></td>
-                    <td>${order.order_date}</td>
-                    <td>
-                        <button class="btn btn-small" onclick="deleteOrder(${order.id})">Delete</button>
-                    </td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
-        });
+        const rows = data.map(order => `
+            <tr>
+                <td>${order.id}</td>
+                <td>${order.customer_name}</td>
+                <td>${order.product}</td>
+                <td>${order.quantity}</td>
+                <td>$${order.total_price.toFixed(2)}</td>
+                <td><span class="status-${order.status.toLowerCase()}">${order.status}</span></td>
+                <td>${order.order_date}</td>
+                <td>
+                    <button class="btn btn-small" onclick="deleteOrder(${order.id})">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+        tbody.innerHTML = rows;
     } catch (error) {
         console.error('Error loading orders:', error);
     }

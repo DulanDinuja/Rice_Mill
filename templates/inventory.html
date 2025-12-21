@@ -50,22 +50,19 @@ async function loadInventory() {
         const response = await fetch('/api/inventory');
         const data = await response.json();
         const tbody = document.getElementById('inventoryBody');
-        tbody.innerHTML = '';
-        data.forEach(item => {
-            const row = `
-                <tr>
-                    <td>${item.id}</td>
-                    <td>${item.item_name}</td>
-                    <td>${item.quantity}</td>
-                    <td>${item.unit}</td>
-                    <td>${item.date_added}</td>
-                    <td>
-                        <button class="btn btn-small" onclick="deleteItem(${item.id})">Delete</button>
-                    </td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
-        });
+        const rows = data.map(item => `
+            <tr>
+                <td>${item.id}</td>
+                <td>${item.item_name}</td>
+                <td>${item.quantity}</td>
+                <td>${item.unit}</td>
+                <td>${item.date_added}</td>
+                <td>
+                    <button class="btn btn-small" onclick="deleteItem(${item.id})">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+        tbody.innerHTML = rows;
     } catch (error) {
         console.error('Error loading inventory:', error);
     }

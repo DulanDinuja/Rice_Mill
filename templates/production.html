@@ -52,23 +52,20 @@ async function loadProduction() {
         const response = await fetch('/api/production');
         const data = await response.json();
         const tbody = document.getElementById('productionBody');
-        tbody.innerHTML = '';
-        data.forEach(record => {
-            const row = `
-                <tr>
-                    <td>${record.id}</td>
-                    <td>${record.raw_material}</td>
-                    <td>${record.raw_quantity}</td>
-                    <td>${record.finished_product}</td>
-                    <td>${record.finished_quantity}</td>
-                    <td>${record.production_date}</td>
-                    <td>
-                        <button class="btn btn-small" onclick="deleteProduction(${record.id})">Delete</button>
-                    </td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
-        });
+        const rows = data.map(record => `
+            <tr>
+                <td>${record.id}</td>
+                <td>${record.raw_material}</td>
+                <td>${record.raw_quantity}</td>
+                <td>${record.finished_product}</td>
+                <td>${record.finished_quantity}</td>
+                <td>${record.production_date}</td>
+                <td>
+                    <button class="btn btn-small" onclick="deleteProduction(${record.id})">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+        tbody.innerHTML = rows;
     } catch (error) {
         console.error('Error loading production:', error);
     }

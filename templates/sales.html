@@ -53,24 +53,21 @@ async function loadSales() {
         const response = await fetch('/api/sales');
         const data = await response.json();
         const tbody = document.getElementById('salesBody');
-        tbody.innerHTML = '';
-        data.forEach(sale => {
-            const row = `
-                <tr>
-                    <td>${sale.id}</td>
-                    <td>${sale.customer_name}</td>
-                    <td>${sale.product}</td>
-                    <td>${sale.quantity}</td>
-                    <td>$${sale.price_per_unit.toFixed(2)}</td>
-                    <td>$${sale.total_amount.toFixed(2)}</td>
-                    <td>${sale.sale_date}</td>
-                    <td>
-                        <button class="btn btn-small" onclick="deleteSale(${sale.id})">Delete</button>
-                    </td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
-        });
+        const rows = data.map(sale => `
+            <tr>
+                <td>${sale.id}</td>
+                <td>${sale.customer_name}</td>
+                <td>${sale.product}</td>
+                <td>${sale.quantity}</td>
+                <td>$${sale.price_per_unit.toFixed(2)}</td>
+                <td>$${sale.total_amount.toFixed(2)}</td>
+                <td>${sale.sale_date}</td>
+                <td>
+                    <button class="btn btn-small" onclick="deleteSale(${sale.id})">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+        tbody.innerHTML = rows;
     } catch (error) {
         console.error('Error loading sales:', error);
     }
