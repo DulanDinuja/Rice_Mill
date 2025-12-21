@@ -6,6 +6,7 @@ import { ROUTES } from '../../utils/constants';
 const GamingSidebar = () => {
   const { logout } = useAuth();
 
+
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: ROUTES.DASHBOARD },
     { icon: Package, label: 'Rice Stock', path: ROUTES.RICE_STOCK },
