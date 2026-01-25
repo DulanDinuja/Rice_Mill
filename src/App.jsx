@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { SidebarProvider } from './context/SidebarContext';
 import PrivateRoute from './routes/PrivateRoute';
 import GamingSidebar from './components/layout/GamingSidebar';
 import CyberNavbar from './components/layout/CyberNavbar';
@@ -18,7 +19,7 @@ const AppLayout = ({ children }) => {
     <div className="min-h-screen bg-[#FDFBF6] dark:bg-transparent">
       <GamingSidebar />
       <CyberNavbar />
-      <main className="ml-64 pt-16 p-6 bg-[#FDFBF6] dark:bg-transparent">
+      <main className="lg:ml-64 pt-20 md:pt-24 px-4 md:px-6 pb-4 md:pb-6 bg-[#FDFBF6] dark:bg-transparent">
         {children}
       </main>
     </div>
@@ -103,44 +104,46 @@ function App() {
     <BrowserRouter>
       <ThemeProvider>
         <AuthProvider>
-          <AppRoutes />
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              className: '',
-              style: {
-                background: 'transparent',
-                color: 'inherit',
-                border: 'none',
-                padding: 0,
-                boxShadow: 'none'
-              },
-              success: {
+          <SidebarProvider>
+            <AppRoutes />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                className: '',
                 style: {
-                  background: '#FFFFFF',
-                  color: '#263238',
-                  border: '1px solid rgba(46, 125, 50, 0.3)',
+                  background: 'transparent',
+                  color: 'inherit',
+                  border: 'none',
+                  padding: 0,
+                  boxShadow: 'none'
                 },
-                iconTheme: {
-                  primary: '#2E7D32',
-                  secondary: '#FFFFFF'
+                success: {
+                  style: {
+                    background: '#FFFFFF',
+                    color: '#263238',
+                    border: '1px solid rgba(46, 125, 50, 0.3)',
+                  },
+                  iconTheme: {
+                    primary: '#2E7D32',
+                    secondary: '#FFFFFF'
+                  },
+                  className: 'dark:!bg-[rgba(26,26,46,0.9)] dark:!text-white dark:!border-[rgba(0,255,136,0.3)]'
                 },
-                className: 'dark:!bg-[rgba(26,26,46,0.9)] dark:!text-white dark:!border-[rgba(0,255,136,0.3)]'
-              },
-              error: {
-                style: {
-                  background: '#FFFFFF',
-                  color: '#263238',
-                  border: '1px solid rgba(211, 47, 47, 0.3)',
-                },
-                iconTheme: {
-                  primary: '#D32F2F',
-                  secondary: '#FFFFFF'
-                },
-                className: 'dark:!bg-[rgba(26,26,46,0.9)] dark:!text-white dark:!border-[rgba(239,68,68,0.3)]'
-              }
-            }}
-          />
+                error: {
+                  style: {
+                    background: '#FFFFFF',
+                    color: '#263238',
+                    border: '1px solid rgba(211, 47, 47, 0.3)',
+                  },
+                  iconTheme: {
+                    primary: '#D32F2F',
+                    secondary: '#FFFFFF'
+                  },
+                  className: 'dark:!bg-[rgba(26,26,46,0.9)] dark:!text-white dark:!border-[rgba(239,68,68,0.3)]'
+                }
+              }}
+            />
+          </SidebarProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>

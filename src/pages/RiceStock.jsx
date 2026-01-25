@@ -13,7 +13,6 @@ import { formatDate, formatCurrency } from '../utils/formatters';
 
 const RiceStock = () => {
   const [stocks, setStocks] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -29,8 +28,6 @@ const RiceStock = () => {
       setStocks(response.data);
     } catch (error) {
       console.error('Failed to load stocks:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -45,6 +42,15 @@ const RiceStock = () => {
       'Out of Stock': 'danger'
     };
     return statusMap[status] || 'default';
+  };
+
+  const getMobileStatusText = (status) => {
+    const mobileTextMap = {
+      'In Stock': 'In',
+      'Low Stock': 'Low',
+      'Out of Stock': 'Out'
+    };
+    return mobileTextMap[status] || status;
   };
 
   const handleStockAdded = (newStock) => {
@@ -70,75 +76,85 @@ const RiceStock = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-gaming font-bold text-gray-900 dark:text-white mb-2">Rice Stock</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage your rice inventory</p>
+          <h1 className="text-2xl md:text-3xl font-gaming font-bold text-gray-900 dark:text-white mb-1 md:mb-2">Rice Stock</h1>
+          <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">Manage your rice inventory</p>
         </div>
-        <div className="flex gap-3">
-          <NeonButton variant="outline" onClick={() => setIsSaleModalOpen(true)}>
+        <div className="flex flex-wrap gap-2 md:gap-3">
+          <NeonButton variant="outline" onClick={() => setIsSaleModalOpen(true)} className="flex-1 sm:flex-none">
             <ShoppingCart size={20} />
-            New Sale
+            <span className="hidden sm:inline">New Sale</span>
           </NeonButton>
-          <NeonButton variant="outline" onClick={() => setIsExportModalOpen(true)}>
+          <NeonButton variant="outline" onClick={() => setIsExportModalOpen(true)} className="flex-1 sm:flex-none">
             <Download size={20} />
-            Export
+            <span className="hidden sm:inline">Export</span>
           </NeonButton>
-          <NeonButton onClick={() => setIsAddModalOpen(true)} className="font-black">
+          <NeonButton onClick={() => setIsAddModalOpen(true)} className="font-black flex-1 sm:flex-none">
             <Plus size={20} />
-            Add Stock
+            <span className="hidden sm:inline">Add Stock</span>
           </NeonButton>
         </div>
       </div>
 
-      <GlassCard>
-        <div className="mb-6">
+      <GlassCard className="overflow-hidden">
+        <div className="mb-4 md:mb-6 px-4 md:px-6 pt-4 md:pt-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#78909C] dark:text-gray-400" size={20} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 dark:text-gray-400" size={20} />
             <input
               type="text"
               placeholder="Search rice type..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full glass-input rounded-lg pl-11 pr-4 py-3"
+              className="w-full glass-input rounded-lg pl-11 pr-4 py-2 md:py-3 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
             />
           </div>
         </div>
 
+        {/* Mobile: Show scroll hint */}
+        <div className="block md:hidden px-4 pb-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 italic">← Scroll horizontally to view all columns →</p>
+        </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-[#2E7D32]/20 dark:border-primary-500/20">
-                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Rice Type</th>
-                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Quantity</th>
-                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Warehouse</th>
-                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Grade</th>
-                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Price/kg</th>
-                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Status</th>
-                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Last Updated</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredStocks.map((stock) => (
-                <tr key={stock.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-                  <td className="py-4 px-4 text-gray-900 dark:text-white font-medium">{stock.riceType}</td>
-                  <td className="py-4 px-4 text-gray-900 dark:text-white">{stock.quantity} {stock.unit}</td>
-                  <td className="py-4 px-4 text-gray-600 dark:text-gray-400">{stock.warehouse}</td>
-                  <td className="py-4 px-4">
-                    <HolographicBadge status="info" size="sm">{stock.grade}</HolographicBadge>
-                  </td>
-                  <td className="py-4 px-4 text-gray-900 dark:text-white">{formatCurrency(stock.pricePerKg)}</td>
-                  <td className="py-4 px-4">
-                    <HolographicBadge status={getStatusBadge(stock.status)}>
-                      {stock.status}
-                    </HolographicBadge>
-                  </td>
-                  <td className="py-4 px-4 text-gray-600 dark:text-gray-400">{formatDate(stock.lastUpdated)}</td>
+          <div className="inline-block min-w-full align-middle">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-white/5">
+              <thead>
+                <tr className="border-b border-[#2E7D32]/20 dark:border-primary-500/20 bg-gray-50 dark:bg-white/[0.02]">
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Rice Type</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Quantity</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Warehouse</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Grade</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Price/kg</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Status</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Last Updated</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white dark:bg-transparent divide-y divide-gray-100 dark:divide-white/5">
+                {filteredStocks.map((stock) => (
+                  <tr key={stock.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                    <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white font-medium text-xs md:text-sm whitespace-nowrap">{stock.riceType}</td>
+                    <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap">{stock.quantity} {stock.unit}</td>
+                    <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{stock.warehouse}</td>
+                    <td className="py-3 md:py-4 px-2 md:px-4">
+                      <HolographicBadge status="info" size="sm" className="md:px-3">
+                        {stock.grade}
+                      </HolographicBadge>
+                    </td>
+                    <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap">{formatCurrency(stock.pricePerKg)}</td>
+                    <td className="py-3 md:py-4 px-2 md:px-4">
+                      <HolographicBadge status={getStatusBadge(stock.status)} size="xs" className="md:!px-3 md:!py-1.5 md:!text-sm">
+                        <span className="md:hidden">{getMobileStatusText(stock.status)}</span>
+                        <span className="hidden md:inline">{stock.status}</span>
+                      </HolographicBadge>
+                    </td>
+                    <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{formatDate(stock.lastUpdated)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </GlassCard>
 

@@ -41,96 +41,96 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Add Rice Stock">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rice Type</label>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rice Type</label>
             <select
               name="riceType"
               value={formData.riceType}
               onChange={handleChange}
-              className="w-full glass-input rounded-lg px-3 py-2"
+              className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
               required
             >
-              <option value="">Select Rice Type</option>
+              <option value="" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Select Rice Type</option>
               {RICE_TYPES.map(type => (
-                <option key={type} value={type}>{type}</option>
+                <option key={type} value={type} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">{type}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Warehouse</label>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Warehouse</label>
             <input
               type="text"
               name="warehouse"
               value={formData.warehouse}
               onChange={handleChange}
-              className="w-full glass-input rounded-lg px-3 py-2"
+              className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
               required
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity</label>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity</label>
             <input
               type="number"
               name="quantity"
               value={formData.quantity}
               onChange={handleChange}
-              className="w-full glass-input rounded-lg px-3 py-2"
+              className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Unit</label>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Unit</label>
             <select
               name="unit"
               value={formData.unit}
               onChange={handleChange}
-              className="w-full glass-input rounded-lg px-3 py-2"
+              className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
             >
               {UNITS.map(unit => (
-                <option key={unit} value={unit}>{unit}</option>
+                <option key={unit} value={unit} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">{unit}</option>
               ))}
             </select>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Grade</label>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Grade</label>
             <select
               name="grade"
               value={formData.grade}
               onChange={handleChange}
-              className="w-full glass-input rounded-lg px-3 py-2"
+              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
             >
               {GRADES.map(grade => (
-                <option key={grade} value={grade}>{grade}</option>
+                <option key={grade} value={grade} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">{grade}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price per kg</label>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price per kg</label>
             <input
               type="number"
               step="0.01"
               name="pricePerKg"
               value={formData.pricePerKg}
               onChange={handleChange}
-              className="w-full glass-input rounded-lg px-3 py-2"
+              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
               required
             />
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4">
-          <NeonButton variant="outline" type="button" onClick={onClose}>
+        <div className="flex flex-col sm:flex-row justify-end gap-2 md:gap-3 pt-4">
+          <NeonButton variant="outline" type="button" onClick={onClose} className="w-full sm:w-auto">
             Cancel
           </NeonButton>
-          <NeonButton type="submit">
+          <NeonButton type="submit" className="w-full sm:w-auto">
             Add Stock
           </NeonButton>
         </div>

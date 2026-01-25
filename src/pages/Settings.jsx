@@ -6,14 +6,14 @@ const Settings = () => {
   const { isDark, toggleTheme } = useTheme();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div>
-        <h1 className="text-3xl font-gaming font-bold text-gray-900 dark:text-white mb-2">Settings</h1>
-        <p className="text-gray-600 dark:text-gray-400">Configure your system preferences</p>
+        <h1 className="text-2xl md:text-3xl font-gaming font-bold text-gray-900 dark:text-white mb-1 md:mb-2">Settings</h1>
+        <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">Configure your system preferences</p>
       </div>
 
       <GlassCard>
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">General Settings</h3>
+        <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4 md:mb-6">General Settings</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-white/10">
             <div>

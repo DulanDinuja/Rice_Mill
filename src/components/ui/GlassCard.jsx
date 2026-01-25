@@ -9,18 +9,18 @@ const GlassCard = ({
   ...props 
 }) => {
   const variants = {
-    default: 'glass-card',
-    elevated: 'glass-card shadow-2xl',
-    minimal: 'bg-white/[0.05] border border-white/[0.08] backdrop-blur-lg',
-    accent: 'glass-card neon-accent'
+    default: 'bg-white/95 dark:bg-white/[0.08] border border-gray-200 dark:border-white/[0.12] backdrop-blur-xl',
+    elevated: 'bg-white/95 dark:bg-white/[0.08] border border-gray-200 dark:border-white/[0.12] backdrop-blur-xl shadow-2xl',
+    minimal: 'bg-white/90 dark:bg-white/[0.05] border border-gray-200 dark:border-white/[0.08] backdrop-blur-lg',
+    accent: 'bg-white/95 dark:bg-white/[0.08] border border-gray-200 dark:border-white/[0.12] backdrop-blur-xl neon-accent'
   };
 
   const paddings = {
     none: '',
-    sm: 'p-4',
-    md: 'p-6',
-    lg: 'p-8',
-    xl: 'p-10'
+    sm: 'p-3 md:p-4',
+    md: 'p-4 md:p-6',
+    lg: 'p-6 md:p-8',
+    xl: 'p-8 md:p-10'
   };
 
   return (

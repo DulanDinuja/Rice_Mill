@@ -1,4 +1,4 @@
-const HolographicBadge = ({ children, status = 'default', size = 'md' }) => {
+const HolographicBadge = ({ children, status = 'default', size = 'md', className = '' }) => {
   const statusColors = {
     success: 'bg-[#2E7D32]/10 text-[#2E7D32] border-[#2E7D32]/30 dark:bg-primary-500/20 dark:text-primary-400 dark:border-primary-500',
     warning: 'bg-[#F9A825]/10 text-[#F9A825] border-[#F9A825]/30 dark:bg-yellow-500/20 dark:text-yellow-400 dark:border-yellow-500',
@@ -8,6 +8,7 @@ const HolographicBadge = ({ children, status = 'default', size = 'md' }) => {
   };
 
   const sizes = {
+    xs: 'px-1.5 py-0.5 text-[10px]',
     sm: 'px-2 py-1 text-xs',
     md: 'px-3 py-1.5 text-sm',
     lg: 'px-4 py-2 text-base'
@@ -16,9 +17,10 @@ const HolographicBadge = ({ children, status = 'default', size = 'md' }) => {
   return (
     <span className={`
       inline-flex items-center rounded-full border
-      font-medium backdrop-blur-sm
+      font-medium backdrop-blur-sm whitespace-nowrap
       ${statusColors[status]}
       ${sizes[size]}
+      ${className}
     `}>
       {children}
     </span>

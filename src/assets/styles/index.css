@@ -387,9 +387,9 @@
     background: linear-gradient(
             90deg,
             #2E7D32,
-            #66BB6A,
+            #4B91B3,
             #F9A825,
-            #2E7D32
+            #352802
     );
     background-size: 200% auto;
     -webkit-background-clip: text;
@@ -498,4 +498,89 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* Mobile-specific utilities */
+  @media (max-width: 768px) {
+    /* Increase touch targets on mobile */
+    button, a, input, select, textarea {
+      min-height: 44px;
+    }
+
+    /* Prevent zoom on focus for iOS */
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+
+    /* Better tap highlight */
+    * {
+      -webkit-tap-highlight-color: rgba(0, 255, 136, 0.1);
+    }
+
+    .dark * {
+      -webkit-tap-highlight-color: rgba(0, 255, 136, 0.2);
+    }
+  }
+
+  /* Smooth scrolling on mobile */
+  @media (max-width: 1024px) {
+    * {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Better table scrolling on mobile */
+    table {
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    /* Improve overflow scrolling */
+    .overflow-x-auto {
+      position: relative;
+      /* Ensure smooth scrolling without color bleeding */
+      isolation: isolate;
+    }
+
+    /* Remove the problematic shadow gradient that causes color issues */
+    .overflow-x-auto:after {
+      display: none;
+    }
+  }
+
+  /* Add proper table background to prevent color issues */
+  @media (max-width: 1024px) {
+    .overflow-x-auto table {
+      background: inherit;
+    }
+
+    /* Light mode table background */
+    :not(.dark) .overflow-x-auto table {
+      background: #FFFFFF;
+    }
+
+    /* Dark mode table background */
+    .dark .overflow-x-auto table {
+      background: rgba(26, 26, 46, 0.7);
+    }
+
+    /* Ensure table cells have proper backgrounds */
+    :not(.dark) .overflow-x-auto table td,
+    :not(.dark) .overflow-x-auto table th {
+      background-color: #FFFFFF;
+    }
+
+    .dark .overflow-x-auto table td,
+    .dark .overflow-x-auto table th {
+      background-color: transparent;
+    }
+
+    /* Prevent hover states from showing through */
+    :not(.dark) .overflow-x-auto table tr:hover td {
+      background-color: #F9FAFB !important;
+    }
+
+    .dark .overflow-x-auto table tr:hover td {
+      background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+  }
 }
+

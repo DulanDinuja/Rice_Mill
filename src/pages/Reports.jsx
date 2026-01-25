@@ -12,15 +12,15 @@ const Reports = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div>
-        <h1 className="text-3xl font-gaming font-bold text-gray-900 dark:text-white mb-2">Reports</h1>
-        <p className="text-gray-600 dark:text-gray-400">Analytics and insights</p>
+        <h1 className="text-2xl md:text-3xl font-gaming font-bold text-gray-900 dark:text-white mb-1 md:mb-2">Reports</h1>
+        <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">Analytics and insights</p>
       </div>
 
       <GlassCard>
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Stock Movement (Last 6 Months)</h3>
-        <ResponsiveContainer width="100%" height={400}>
+        <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4 md:mb-6">Stock Movement (Last 6 Months)</h3>
+        <ResponsiveContainer width="100%" height={300} className="md:h-[400px]">
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(46, 125, 50, 0.2)" className="dark:stroke-[rgba(255,255,255,0.1)]" />
             <XAxis dataKey="month" stroke="#2E7D32" className="dark:stroke-[#00FF88]" />

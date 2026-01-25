@@ -11,13 +11,13 @@ const Warehouse = () => {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div>
-        <h1 className="text-3xl font-gaming font-bold text-gray-900 dark:text-white mb-2">Warehouses</h1>
-        <p className="text-gray-600 dark:text-gray-400">Monitor warehouse capacity and conditions</p>
+        <h1 className="text-2xl md:text-3xl font-gaming font-bold text-gray-900 dark:text-white mb-1 md:mb-2">Warehouses</h1>
+        <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">Monitor warehouse capacity and conditions</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         {warehouses.map((warehouse) => (
           <GlassCard key={warehouse.id}>
             <div className="space-y-4">
