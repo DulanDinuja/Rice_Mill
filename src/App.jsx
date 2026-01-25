@@ -19,7 +19,7 @@ const AppLayout = ({ children }) => {
     <div className="min-h-screen bg-[#FDFBF6] dark:bg-transparent">
       <GamingSidebar />
       <CyberNavbar />
-      <main className="lg:ml-64 pt-20 md:pt-24 px-4 md:px-6 pb-4 md:pb-6 bg-[#FDFBF6] dark:bg-transparent">
+      <main className="md:ml-64 pt-20 md:pt-24 px-4 md:px-6 pb-4 md:pb-6 bg-[#FDFBF6] dark:bg-transparent">
         {children}
       </main>
     </div>

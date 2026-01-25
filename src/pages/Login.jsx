@@ -34,17 +34,17 @@ const Login = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-md"
       >
-        <div className="glass-card rounded-2xl p-8 space-y-6">
+        <div className="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
           <div className="text-right">
-            <div className="flex items-center justify-end mr-[35px] gap-0 mb-2">
+            <div className="flex items-center justify-end mr-[15px] sm:mr-[25px] md:mr-[35px] gap-0 mb-2">
               <img
                 src="/src/logo/logo.png"
                 alt="Sameera Rice Logo"
-                className="w-[198px] h-[198px] md:w-[200px] md:h-[210px] object-contain flex-shrink-0"
+                className="w-[140px] h-[140px] sm:w-[170px] sm:h-[170px] md:w-[198px] md:h-[198px] lg:w-[200px] lg:h-[210px] object-contain flex-shrink-0"
               />
-              <h1 className="text-6xl md:text-7xl font-['Brush_Script_MT'] font-normal italic tracking-tight whitespace-nowrap drop-shadow-lg animate-signature-color scale-x-85 scale-y-90 -ml-[69px] mt-[38px]" style={{ lineHeight: '1.8' }}>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-['Brush_Script_MT'] font-normal italic tracking-tight whitespace-nowrap drop-shadow-lg animate-signature-color scale-x-85 scale-y-90 -ml-[50px] sm:-ml-[60px] md:-ml-[69px] mt-[25px] sm:mt-[32px] md:mt-[38px]" style={{ lineHeight: '1.8' }}>
                 ameera Rice
               </h1>
             </div>
