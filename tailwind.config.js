@@ -4,9 +4,22 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
+        // Light mode - Traditional Inventory Colors
+        light: {
+          primary: '#2E7D32',      // Deep Green
+          secondary: '#66BB6A',    // Paddy Green
+          accent: '#F9A825',       // Rice Gold
+          background: '#FDFBF6',   // Soft Cream
+          card: '#FFFFFF',         // White
+          textPrimary: '#263238',  // Dark Gray
+          textMuted: '#607D8B',    // Gray
+          danger: '#D32F2F'        // Soft Red
+        },
+        // Dark mode - Gaming Glass Colors
         primary: {
           50: '#e6fff4',
           100: '#ccffea',

@@ -23,7 +23,7 @@ const IOSInput = ({
     <div className="space-y-2">
       {label && (
         <motion.label 
-          className="block text-sm font-medium text-white/80"
+          className="block text-sm font-medium text-gray-700 dark:text-white/80"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -34,7 +34,7 @@ const IOSInput = ({
       
       <div className="relative">
         {Icon && (
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50">
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-white/50">
             <Icon className="w-4 h-4" />
           </div>
         )}
@@ -45,8 +45,8 @@ const IOSInput = ({
           className={`
             ${variants[variant]}
             ${Icon ? 'pl-10' : 'pl-4'} pr-4 py-3
-            w-full text-white placeholder-white/50
-            ${error ? 'border-red-500/50 focus:border-red-500' : ''}
+            w-full text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50
+            ${error ? 'border-red-500/50 focus:border-red-500 dark:border-red-500/50 dark:focus:border-red-500' : ''}
             ${className}
           `}
           onFocus={() => setIsFocused(true)}
@@ -58,7 +58,7 @@ const IOSInput = ({
         
         {isFocused && (
           <motion.div
-            className="absolute inset-0 rounded-xl border-2 border-primary-500/30 pointer-events-none"
+            className="absolute inset-0 rounded-xl border-2 border-[#2E7D32]/30 dark:border-primary-500/30 pointer-events-none"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -69,7 +69,7 @@ const IOSInput = ({
       
       {error && (
         <motion.p 
-          className="text-sm text-red-400"
+          className="text-sm text-[#D32F2F] dark:text-red-400"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}

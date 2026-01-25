@@ -9,11 +9,11 @@ const NeonButton = ({
   ...props 
 }) => {
   const variants = {
-    primary: 'bg-primary-500/90 hover:bg-primary-500 text-white border-primary-400/50 shadow-lg hover:shadow-primary-500/25',
-    secondary: 'bg-white/[0.08] hover:bg-white/[0.12] text-white border-white/[0.12] hover:border-white/[0.2]',
-    danger: 'bg-red-500/90 hover:bg-red-500 text-white border-red-400/50 shadow-lg hover:shadow-red-500/25',
-    outline: 'bg-transparent hover:bg-primary-500/10 text-primary-400 border-primary-500/30 hover:border-primary-500/50',
-    glass: 'glass-button text-primary-400 hover:text-primary-300'
+    primary: 'text-white bg-[#2E7D32] hover:bg-[#1B5E20] border-[#2E7D32] shadow-lg hover:shadow-[#2E7D32]/25 dark:bg-primary-500/90 dark:hover:bg-primary-500 dark:border-primary-400/50 dark:hover:shadow-primary-500/25',
+    secondary: 'bg-gray-100 hover:bg-gray-200 text-gray-900 border-gray-200 dark:bg-white/[0.08] dark:hover:bg-white/[0.12] dark:text-white dark:border-white/[0.12] dark:hover:border-white/[0.2]',
+    danger: 'text-white bg-[#D32F2F] hover:bg-[#B71C1C] border-[#D32F2F] shadow-lg dark:bg-red-500/90 dark:hover:bg-red-500 dark:border-red-400/50 dark:hover:shadow-red-500/25',
+    outline: 'bg-transparent hover:bg-[#2E7D32]/10 text-[#2E7D32] border-[#2E7D32]/30 hover:border-[#2E7D32]/50 dark:hover:bg-primary-500/10 dark:text-primary-400 dark:border-primary-500/30 dark:hover:border-primary-500/50',
+    glass: 'glass-button text-white dark:text-primary-400 dark:hover:text-primary-300'
   };
 
   const sizes = {

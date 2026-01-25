@@ -15,10 +15,10 @@ import Settings from './pages/Settings';
 
 const AppLayout = ({ children }) => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#FDFBF6] dark:bg-transparent">
       <GamingSidebar />
       <CyberNavbar />
-      <main className="ml-64 pt-16 p-6">
+      <main className="ml-64 pt-16 p-6 bg-[#FDFBF6] dark:bg-transparent">
         {children}
       </main>
     </div>
@@ -107,17 +107,37 @@ function App() {
           <Toaster
             position="top-right"
             toastOptions={{
+              className: '',
               style: {
-                background: 'rgba(26, 26, 46, 0.9)',
-                color: '#fff',
-                border: '1px solid rgba(0, 255, 136, 0.3)',
-                backdropFilter: 'blur(10px)'
+                background: 'transparent',
+                color: 'inherit',
+                border: 'none',
+                padding: 0,
+                boxShadow: 'none'
               },
               success: {
+                style: {
+                  background: '#FFFFFF',
+                  color: '#263238',
+                  border: '1px solid rgba(46, 125, 50, 0.3)',
+                },
                 iconTheme: {
-                  primary: '#00FF88',
-                  secondary: '#0A0A0A'
-                }
+                  primary: '#2E7D32',
+                  secondary: '#FFFFFF'
+                },
+                className: 'dark:!bg-[rgba(26,26,46,0.9)] dark:!text-white dark:!border-[rgba(0,255,136,0.3)]'
+              },
+              error: {
+                style: {
+                  background: '#FFFFFF',
+                  color: '#263238',
+                  border: '1px solid rgba(211, 47, 47, 0.3)',
+                },
+                iconTheme: {
+                  primary: '#D32F2F',
+                  secondary: '#FFFFFF'
+                },
+                className: 'dark:!bg-[rgba(26,26,46,0.9)] dark:!text-white dark:!border-[rgba(239,68,68,0.3)]'
               }
             }}
           />

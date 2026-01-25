@@ -1,8 +1,10 @@
-import { Bell, User, Search } from 'lucide-react';
+import { Bell, User, Search, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 const CyberNavbar = () => {
   const { user } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <nav className="glass-navbar h-16 fixed top-0 left-64 right-0 z-30 px-6 flex items-center justify-between">
@@ -18,14 +20,26 @@ const CyberNavbar = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="relative p-2 hover:bg-white/5 rounded-lg transition-colors">
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-lg transition-colors hover:bg-white/5"
+          title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+          {isDark ? (
+            <Sun size={20} className="text-primary-400" />
+          ) : (
+            <Moon size={20} className="text-[#2E7D32]" />
+          )}
+        </button>
+
+        <button className="relative p-2 rounded-lg transition-colors hover:bg-white/5">
           <Bell size={20} className="text-primary-400" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-neon-pulse" />
+          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 animate-neon-pulse" />
         </button>
 
         <div className="flex items-center gap-3 px-4 py-2 glass-card rounded-lg">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
-            <User size={16} />
+          <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-primary-500 to-secondary-500">
+            <User size={16} className="text-white" />
           </div>
           <div className="text-sm">
             <p className="font-medium text-white">{user?.name}</p>

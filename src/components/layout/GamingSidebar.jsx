@@ -17,12 +17,12 @@ const GamingSidebar = () => {
   ];
 
   return (
-    <aside className="glass-sidebar w-64 min-h-screen fixed left-0 top-0 z-40">
+    <aside className="glass-sidebar w-64 min-h-screen fixed left-0 top-0 z-40 bg-white dark:bg-transparent">
       <div className="p-6">
         <h1 className="text-4xl font-gaming font-bold holographic-text">
           SAMEERA RICE
         </h1>
-        <p className="text-xs text-primary-400 mt-1">Inventory System</p>
+        <p className="text-xs mt-1 text-green-700 dark:text-primary-400">Inventory System</p>
       </div>
 
       <nav className="px-3 space-y-1">
@@ -34,8 +34,8 @@ const GamingSidebar = () => {
               flex items-center gap-3 px-4 py-3 rounded-lg
               transition-all duration-300
               ${isActive 
-                ? 'bg-primary-500/20 text-primary-400 border-l-4 border-primary-500' 
-                : 'text-gray-400 hover:bg-white/5 hover:text-primary-400'
+                ? 'border-l-4 bg-primary-500/20 text-primary-600 dark:text-primary-400 border-primary-500' 
+                : 'text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-primary-600 dark:hover:text-primary-400'
               }
             `}
           >
@@ -49,12 +49,13 @@ const GamingSidebar = () => {
         <button
           onClick={logout}
           className="flex items-center gap-3 px-4 py-3 rounded-lg w-full
-            text-red-400 hover:bg-red-500/10 transition-all duration-300"
+            transition-all duration-300
+            text-red-600 dark:text-red-400 hover:bg-red-500/10"
         >
           <LogOut size={20} />
           <span className="font-medium">Logout</span>
         </button>
-        <p className="text-xs text-gray-500 text-center">© Dulan Karunarathna</p>
+        <p className="text-xs text-center text-gray-500 dark:text-gray-500">© Dulan Karunarathna</p>
       </div>
     </aside>
   );

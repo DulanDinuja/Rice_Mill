@@ -30,7 +30,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 cyber-grid">
+    <div className="min-h-screen flex items-center justify-center p-4 cyber-grid bg-[#FDFBF6] dark:bg-transparent">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -41,7 +41,7 @@ const Login = () => {
             <h1 className="text-4xl font-gaming font-bold holographic-text mb-2">
               SAMEERA RICE
             </h1>
-            <p className="text-gray-400">Inventory Management System</p>
+            <p className="text-gray-600 dark:text-gray-400">Inventory Management System</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -74,7 +74,7 @@ const Login = () => {
             </NeonButton>
           </form>
 
-          <div className="text-center text-sm text-gray-400">
+          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
             Demo: admin@sameera.com / any password
           </div>
         </div>

@@ -24,7 +24,7 @@ const ExportModal = ({ isOpen, onClose, title, onExport }) => {
     <Modal isOpen={isOpen} onClose={onClose} title={`Export ${title}`}>
       <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-3">Export Format</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Export Format</label>
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => setExportFormat('csv')}
@@ -54,7 +54,7 @@ const ExportModal = ({ isOpen, onClose, title, onExport }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Date Range</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date Range</label>
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
@@ -68,13 +68,13 @@ const ExportModal = ({ isOpen, onClose, title, onExport }) => {
           </select>
         </div>
 
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <ExternalLink className="text-blue-400 mt-0.5" size={16} />
+            <ExternalLink className="text-blue-600 dark:text-blue-400 mt-0.5" size={16} />
             <div>
-              <div className="text-blue-400 font-medium text-sm">Export Options</div>
-              <div className="text-gray-400 text-xs mt-1">
-                {exportFormat === 'csv' 
+              <div className="text-blue-700 dark:text-blue-400 font-medium text-sm">Export Options</div>
+              <div className="text-gray-600 dark:text-gray-400 text-xs mt-1">
+                {exportFormat === 'csv'
                   ? 'CSV file will be downloaded directly to your computer'
                   : 'Preview will open in a new window with print and download options'
                 }

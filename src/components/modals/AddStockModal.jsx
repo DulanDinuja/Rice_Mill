@@ -44,7 +44,7 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Rice Type</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rice Type</label>
             <select
               name="riceType"
               value={formData.riceType}
@@ -59,7 +59,7 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Warehouse</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Warehouse</label>
             <input
               type="text"
               name="warehouse"
@@ -73,7 +73,7 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Quantity</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity</label>
             <input
               type="number"
               name="quantity"
@@ -84,7 +84,7 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Unit</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Unit</label>
             <select
               name="unit"
               value={formData.unit}
@@ -100,7 +100,7 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Grade</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Grade</label>
             <select
               name="grade"
               value={formData.grade}
@@ -113,7 +113,7 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Price per kg</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price per kg</label>
             <input
               type="number"
               step="0.01"

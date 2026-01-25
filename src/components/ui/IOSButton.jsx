@@ -13,9 +13,9 @@ const IOSButton = ({
 }) => {
   const variants = {
     primary: 'ios-button-primary text-white font-medium',
-    secondary: 'ios-button-secondary text-white/90 font-medium',
-    glass: 'glass-button text-primary-400 hover:text-primary-300',
-    outline: 'bg-transparent border-2 border-primary-500/30 hover:border-primary-500/50 text-primary-400 hover:bg-primary-500/10'
+    secondary: 'ios-button-secondary font-medium text-gray-900 dark:text-white/90',
+    glass: 'glass-button text-white dark:text-primary-400 dark:hover:text-primary-300',
+    outline: 'bg-transparent border-2 border-[#2E7D32]/30 hover:border-[#2E7D32]/50 text-[#2E7D32] hover:bg-[#2E7D32]/10 dark:border-primary-500/30 dark:hover:border-primary-500/50 dark:text-primary-400 dark:hover:bg-primary-500/10'
   };
 
   const sizes = {
@@ -63,4 +63,14 @@ const IOSButton = ({
           <span>Loading...</span>
         </motion.div>
       ) : (
-        <>\n          {Icon && iconPosition === 'left' && <Icon className="w-4 h-4" />}\n          {children}\n          {Icon && iconPosition === 'right' && <Icon className="w-4 h-4" />}\n        </>\n      )}\n    </motion.button>\n  );\n};\n\nexport default IOSButton;
+        <>
+          {Icon && iconPosition === 'left' && <Icon className="w-4 h-4" />}
+          {children}
+          {Icon && iconPosition === 'right' && <Icon className="w-4 h-4" />}
+        </>
+      )}
+    </motion.button>
+  );
+};
+
+export default IOSButton;

@@ -17,8 +17,8 @@ const CyberInput = ({
 
   const variants = {
     default: 'glass-input',
-    minimal: 'bg-white/[0.04] border border-white/[0.06] backdrop-blur-md',
-    solid: 'bg-dark-card border border-white/[0.1]'
+    minimal: 'bg-white/[0.04] border border-white/[0.06] backdrop-blur-md dark:bg-white/[0.04] dark:border-white/[0.06]',
+    solid: 'bg-white border-gray-200 dark:bg-dark-card dark:border-white/[0.1]'
   };
 
   return (
@@ -29,13 +29,13 @@ const CyberInput = ({
       className="space-y-2"
     >
       {label && (
-        <label className="block text-sm font-medium text-white/80 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-white/80 mb-2">
           {label}
         </label>
       )}
       <div className="relative">
         {Icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-400/70">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#2E7D32]/70 dark:text-primary-400/70">
             <Icon size={18} />
           </div>
         )}
@@ -44,11 +44,11 @@ const CyberInput = ({
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           className={`
             w-full ${sizes[size]} ${variants[variant]}
-            text-white placeholder-white/40
+            text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/40
             transition-all duration-200 ease-out
             focus:outline-none focus:ring-0
             ${Icon ? 'pl-11' : ''}
-            ${error ? 'border-red-400/50 focus:border-red-400' : ''}
+            ${error ? 'border-red-400/50 focus:border-red-400 dark:border-red-400/50 dark:focus:border-red-400' : ''}
             ${className}
           `}
           {...props}
@@ -58,9 +58,9 @@ const CyberInput = ({
         <motion.p 
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-sm text-red-400 flex items-center gap-1"
+          className="text-sm text-[#D32F2F] dark:text-red-400 flex items-center gap-1"
         >
-          <span className="w-1 h-1 bg-red-400 rounded-full" />
+          <span className="w-1 h-1 bg-[#D32F2F] dark:bg-red-400 rounded-full" />
           {error}
         </motion.p>
       )}

@@ -61,7 +61,7 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
     <Modal isOpen={isOpen} onClose={onClose} title={`New ${title} Sale`}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Select {title}
           </label>
           <select
@@ -82,7 +82,7 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Customer Name
             </label>
             <input
@@ -96,7 +96,7 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Phone Number
             </label>
             <input
@@ -112,7 +112,7 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Quantity (kg)
             </label>
             <input
@@ -134,7 +134,7 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Price per kg (Rs.)
             </label>
             <input
@@ -152,7 +152,7 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Sale Date
           </label>
           <input
@@ -165,10 +165,10 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
           />
         </div>
 
-        <div className="bg-primary-500/10 border border-primary-500/20 rounded-lg p-4">
+        <div className="bg-[#2E7D32]/10 border border-[#2E7D32]/20 dark:bg-primary-500/10 dark:border-primary-500/20 rounded-lg p-4">
           <div className="flex justify-between items-center">
-            <span className="text-primary-400 font-medium">Total Amount:</span>
-            <span className="text-white text-xl font-bold">
+            <span className="text-[#2E7D32] dark:text-primary-400 font-medium">Total Amount:</span>
+            <span className="text-gray-900 dark:text-white text-xl font-bold">
               Rs. {formData.totalAmount.toFixed(2)}
             </span>
           </div>

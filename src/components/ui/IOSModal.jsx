@@ -125,20 +125,20 @@ const IOSModal = ({
           >
             {variant === 'sheet' && (
               <div className="flex justify-center pt-3 pb-2">
-                <div className="w-10 h-1 bg-white/30 rounded-full" />
+                <div className="w-10 h-1 bg-gray-300 dark:bg-white/30 rounded-full" />
               </div>
             )}
             
             {title && (
-              <div className="flex items-center justify-between p-6 border-b border-white/10">
-                <h2 className="text-xl font-semibold text-white">{title}</h2>
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-white/10">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h2>
                 <motion.button
                   onClick={onClose}
-                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 ios-smooth"
+                  className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/20 ios-smooth"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <X className="w-4 h-4 text-white" />
+                  <X className="w-4 h-4 text-gray-700 dark:text-white" />
                 </motion.button>
               </div>
             )}

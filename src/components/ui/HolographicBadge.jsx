@@ -1,10 +1,10 @@
 const HolographicBadge = ({ children, status = 'default', size = 'md' }) => {
   const statusColors = {
-    success: 'bg-primary-500/20 text-primary-400 border-primary-500',
-    warning: 'bg-yellow-500/20 text-yellow-400 border-yellow-500',
-    danger: 'bg-red-500/20 text-red-400 border-red-500',
-    info: 'bg-accent-500/20 text-accent-400 border-accent-500',
-    default: 'bg-gray-500/20 text-gray-400 border-gray-500'
+    success: 'bg-[#2E7D32]/10 text-[#2E7D32] border-[#2E7D32]/30 dark:bg-primary-500/20 dark:text-primary-400 dark:border-primary-500',
+    warning: 'bg-[#F9A825]/10 text-[#F9A825] border-[#F9A825]/30 dark:bg-yellow-500/20 dark:text-yellow-400 dark:border-yellow-500',
+    danger: 'bg-[#D32F2F]/10 text-[#D32F2F] border-[#D32F2F]/30 dark:bg-red-500/20 dark:text-red-400 dark:border-red-500',
+    info: 'bg-[#66BB6A]/10 text-[#66BB6A] border-[#66BB6A]/30 dark:bg-accent-500/20 dark:text-accent-400 dark:border-accent-500',
+    default: 'bg-gray-200 text-gray-700 border-gray-300 dark:bg-gray-500/20 dark:text-gray-400 dark:border-gray-500'
   };
 
   const sizes = {

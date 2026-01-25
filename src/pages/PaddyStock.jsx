@@ -59,8 +59,8 @@ const PaddyStock = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-gaming font-bold text-white mb-2">Paddy Stock</h1>
-          <p className="text-gray-400">Manage your paddy inventory</p>
+          <h1 className="text-3xl font-gaming font-bold text-gray-900 dark:text-white mb-2">Paddy Stock</h1>
+          <p className="text-gray-600 dark:text-gray-400">Manage your paddy inventory</p>
         </div>
         <div className="flex gap-3">
           <NeonButton variant="outline" onClick={() => setIsSaleModalOpen(true)}>
@@ -82,25 +82,25 @@ const PaddyStock = () => {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-secondary-500/20">
-                <th className="text-left py-3 px-4 text-secondary-400 font-medium">Paddy Type</th>
-                <th className="text-left py-3 px-4 text-secondary-400 font-medium">Quantity</th>
-                <th className="text-left py-3 px-4 text-secondary-400 font-medium">Warehouse</th>
-                <th className="text-left py-3 px-4 text-secondary-400 font-medium">Moisture %</th>
-                <th className="text-left py-3 px-4 text-secondary-400 font-medium">Supplier</th>
-                <th className="text-left py-3 px-4 text-secondary-400 font-medium">Price/kg</th>
-                <th className="text-left py-3 px-4 text-secondary-400 font-medium">Status</th>
+              <tr className="border-b border-[#66BB6A]/20 dark:border-secondary-500/20">
+                <th className="text-left py-3 px-4 text-[#66BB6A] dark:text-secondary-400 font-medium">Paddy Type</th>
+                <th className="text-left py-3 px-4 text-[#66BB6A] dark:text-secondary-400 font-medium">Quantity</th>
+                <th className="text-left py-3 px-4 text-[#66BB6A] dark:text-secondary-400 font-medium">Warehouse</th>
+                <th className="text-left py-3 px-4 text-[#66BB6A] dark:text-secondary-400 font-medium">Moisture %</th>
+                <th className="text-left py-3 px-4 text-[#66BB6A] dark:text-secondary-400 font-medium">Supplier</th>
+                <th className="text-left py-3 px-4 text-[#66BB6A] dark:text-secondary-400 font-medium">Price/kg</th>
+                <th className="text-left py-3 px-4 text-[#66BB6A] dark:text-secondary-400 font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
               {stocks.map((stock) => (
-                <tr key={stock.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                  <td className="py-4 px-4 text-white font-medium">{stock.paddyType}</td>
-                  <td className="py-4 px-4 text-white">{stock.quantity} {stock.unit}</td>
-                  <td className="py-4 px-4 text-gray-400">{stock.warehouse}</td>
-                  <td className="py-4 px-4 text-white">{stock.moistureLevel}%</td>
-                  <td className="py-4 px-4 text-gray-400">{stock.supplier}</td>
-                  <td className="py-4 px-4 text-white">{formatCurrency(stock.pricePerKg)}</td>
+                <tr key={stock.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                  <td className="py-4 px-4 text-gray-900 dark:text-white font-medium">{stock.paddyType}</td>
+                  <td className="py-4 px-4 text-gray-900 dark:text-white">{stock.quantity} {stock.unit}</td>
+                  <td className="py-4 px-4 text-gray-600 dark:text-gray-400">{stock.warehouse}</td>
+                  <td className="py-4 px-4 text-gray-900 dark:text-white">{stock.moistureLevel}%</td>
+                  <td className="py-4 px-4 text-gray-600 dark:text-gray-400">{stock.supplier}</td>
+                  <td className="py-4 px-4 text-gray-900 dark:text-white">{formatCurrency(stock.pricePerKg)}</td>
                   <td className="py-4 px-4">
                     <HolographicBadge status="success">{stock.status}</HolographicBadge>
                   </td>

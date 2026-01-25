@@ -46,7 +46,7 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Paddy Type</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Paddy Type</label>
             <select
               name="paddyType"
               value={formData.paddyType}
@@ -61,7 +61,7 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded }) => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Warehouse</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Warehouse</label>
             <input
               type="text"
               name="warehouse"
@@ -75,7 +75,7 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Quantity</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity</label>
             <input
               type="number"
               name="quantity"
@@ -86,7 +86,7 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded }) => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Unit</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Unit</label>
             <select
               name="unit"
               value={formData.unit}
@@ -94,7 +94,7 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded }) => {
               className="w-full glass-input rounded-lg px-3 py-2"
             >
               {UNITS.map(unit => (
-                <option key={unit} value={unit}>{unit}</option>
+                <option key={unit} value={unit} className="bg-white dark:bg-dark-card text-gray-900 dark:text-white">{unit}</option>
               ))}
             </select>
           </div>
@@ -102,7 +102,7 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Moisture Level (%)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Moisture Level (%)</label>
             <input
               type="number"
               step="0.1"
@@ -114,7 +114,7 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded }) => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Supplier</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Supplier</label>
             <input
               type="text"
               name="supplier"
@@ -127,7 +127,7 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Price per kg</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price per kg</label>
           <input
             type="number"
             step="0.01"

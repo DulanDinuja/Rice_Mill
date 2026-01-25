@@ -73,8 +73,8 @@ const RiceStock = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-gaming font-bold text-white mb-2">Rice Stock</h1>
-          <p className="text-gray-400">Manage your rice inventory</p>
+          <h1 className="text-3xl font-gaming font-bold text-gray-900 dark:text-white mb-2">Rice Stock</h1>
+          <p className="text-gray-600 dark:text-gray-400">Manage your rice inventory</p>
         </div>
         <div className="flex gap-3">
           <NeonButton variant="outline" onClick={() => setIsSaleModalOpen(true)}>
@@ -109,32 +109,32 @@ const RiceStock = () => {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-primary-500/20">
-                <th className="text-left py-3 px-4 text-primary-400 font-medium">Rice Type</th>
-                <th className="text-left py-3 px-4 text-primary-400 font-medium">Quantity</th>
-                <th className="text-left py-3 px-4 text-primary-400 font-medium">Warehouse</th>
-                <th className="text-left py-3 px-4 text-primary-400 font-medium">Grade</th>
-                <th className="text-left py-3 px-4 text-primary-400 font-medium">Price/kg</th>
-                <th className="text-left py-3 px-4 text-primary-400 font-medium">Status</th>
-                <th className="text-left py-3 px-4 text-primary-400 font-medium">Last Updated</th>
+              <tr className="border-b border-[#2E7D32]/20 dark:border-primary-500/20">
+                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Rice Type</th>
+                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Quantity</th>
+                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Warehouse</th>
+                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Grade</th>
+                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Price/kg</th>
+                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Status</th>
+                <th className="text-left py-3 px-4 text-[#2E7D32] dark:text-primary-400 font-medium">Last Updated</th>
               </tr>
             </thead>
             <tbody>
               {filteredStocks.map((stock) => (
-                <tr key={stock.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                  <td className="py-4 px-4 text-white font-medium">{stock.riceType}</td>
-                  <td className="py-4 px-4 text-white">{stock.quantity} {stock.unit}</td>
-                  <td className="py-4 px-4 text-gray-400">{stock.warehouse}</td>
+                <tr key={stock.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                  <td className="py-4 px-4 text-gray-900 dark:text-white font-medium">{stock.riceType}</td>
+                  <td className="py-4 px-4 text-gray-900 dark:text-white">{stock.quantity} {stock.unit}</td>
+                  <td className="py-4 px-4 text-gray-600 dark:text-gray-400">{stock.warehouse}</td>
                   <td className="py-4 px-4">
                     <HolographicBadge status="info" size="sm">{stock.grade}</HolographicBadge>
                   </td>
-                  <td className="py-4 px-4 text-white">{formatCurrency(stock.pricePerKg)}</td>
+                  <td className="py-4 px-4 text-gray-900 dark:text-white">{formatCurrency(stock.pricePerKg)}</td>
                   <td className="py-4 px-4">
                     <HolographicBadge status={getStatusBadge(stock.status)}>
                       {stock.status}
                     </HolographicBadge>
                   </td>
-                  <td className="py-4 px-4 text-gray-400">{formatDate(stock.lastUpdated)}</td>
+                  <td className="py-4 px-4 text-gray-600 dark:text-gray-400">{formatDate(stock.lastUpdated)}</td>
                 </tr>
               ))}
             </tbody>

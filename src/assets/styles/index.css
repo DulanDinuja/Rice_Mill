@@ -8,16 +8,28 @@
   * {
     @apply border-border;
   }
-  
+
+  /* Base body styles */
   body {
-    @apply bg-dark-bg text-white font-sans antialiased;
-    background: 
-      radial-gradient(circle at 20% 80%, rgba(138, 43, 226, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(0, 217, 255, 0.05) 0%, transparent 50%),
-      linear-gradient(135deg, #0A0A0A 0%, #1A1A2E 100%);
-    background-attachment: fixed;
+    @apply font-sans antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  /* Light mode background - Traditional inventory vibe */
+  body {
+    background: #FDFBF6;
+    color: #263238;
+  }
+
+  /* Dark mode background - Gaming glass vibe */
+  .dark body {
+    background:
+            radial-gradient(circle at 20% 80%, rgba(138, 43, 226, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(0, 217, 255, 0.05) 0%, transparent 50%),
+            linear-gradient(135deg, #0A0A0A 0%, #1A1A2E 100%);
+    background-attachment: fixed;
+    color: #FFFFFF;
   }
 
   ::-webkit-scrollbar {
@@ -29,13 +41,24 @@
     @apply bg-transparent;
   }
 
-  ::-webkit-scrollbar-thumb {
+  /* Dark mode scrollbar */
+  .dark ::-webkit-scrollbar-thumb {
     @apply bg-white/20 rounded-full;
     border-radius: 10px;
   }
 
-  ::-webkit-scrollbar-thumb:hover {
+  .dark ::-webkit-scrollbar-thumb:hover {
     @apply bg-primary-400/60;
+  }
+
+  /* Light mode scrollbar */
+  :not(.dark) ::-webkit-scrollbar-thumb {
+    background: rgba(46, 125, 50, 0.3);
+    border-radius: 10px;
+  }
+
+  :not(.dark) ::-webkit-scrollbar-thumb:hover {
+    background: rgba(46, 125, 50, 0.5);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -45,14 +68,30 @@
 }
 
 @layer components {
+  /* Dark Mode - iOS Glass Card */
   .ios-card {
     @apply bg-white/[0.08] backdrop-blur-xl border border-white/[0.12] rounded-2xl;
-    box-shadow: 
-      0 1px 3px rgba(0, 0, 0, 0.12),
-      0 1px 2px rgba(0, 0, 0, 0.24),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow:
+            0 1px 3px rgba(0, 0, 0, 0.12),
+            0 1px 2px rgba(0, 0, 0, 0.24),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
+  /* Light Mode - Traditional Card */
+  .dark .ios-card {
+    @apply bg-white/[0.08] backdrop-blur-xl border border-white/[0.12];
+  }
+
+  :not(.dark) .ios-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(46, 125, 50, 0.1);
+    box-shadow:
+            0 2px 8px rgba(46, 125, 50, 0.06),
+            0 1px 3px rgba(0, 0, 0, 0.04);
+    backdrop-filter: none;
+  }
+
+  /* Dark Mode - iOS Button */
   .ios-button {
     @apply px-6 py-3 rounded-xl font-medium transition-all duration-200;
     @apply bg-primary-500/90 hover:bg-primary-500 active:scale-95;
@@ -60,11 +99,60 @@
     backdrop-filter: blur(10px);
   }
 
+  /* Light Mode - Traditional Button */
+  .dark .ios-button {
+    @apply bg-primary-500/90 hover:bg-primary-500;
+    backdrop-filter: blur(10px);
+  }
+
+  :not(.dark) .ios-button {
+    background: #2E7D32;
+    color: #FFFFFF;
+    box-shadow:
+            0 2px 8px rgba(46, 125, 50, 0.2),
+            0 1px 3px rgba(0, 0, 0, 0.1);
+    backdrop-filter: none;
+  }
+
+  :not(.dark) .ios-button:hover {
+    background: #1B5E20;
+    box-shadow:
+            0 4px 12px rgba(46, 125, 50, 0.3),
+            0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Dark Mode - iOS Input */
   .ios-input {
     @apply bg-white/[0.06] border border-white/[0.08] rounded-xl px-4 py-3;
     @apply focus:bg-white/[0.1] focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20;
     @apply transition-all duration-200 outline-none;
     backdrop-filter: blur(8px);
+  }
+
+  /* Light Mode - Traditional Input */
+  .dark .ios-input {
+    @apply bg-white/[0.06] border-white/[0.08] text-white placeholder-white/50;
+    backdrop-filter: blur(8px);
+  }
+
+  :not(.dark) .ios-input {
+    background: #FFFFFF;
+    border: 1.5px solid rgba(46, 125, 50, 0.2);
+    color: #263238;
+    backdrop-filter: none;
+  }
+
+  :not(.dark) .ios-input::placeholder {
+    color: #607D8B;
+    opacity: 0.6;
+  }
+
+  :not(.dark) .ios-input:focus {
+    background: #FFFFFF;
+    border-color: #2E7D32;
+    box-shadow:
+            0 0 0 3px rgba(46, 125, 50, 0.1),
+            0 2px 8px rgba(46, 125, 50, 0.08);
   }
 
   .ios-section {
@@ -100,29 +188,101 @@
     box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
   }
 
+  /* Glass Card - Dark Mode DEFAULT */
   .glass-card {
-    @apply bg-white/[0.08] backdrop-blur-xl border border-white/[0.12] rounded-xl;
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 1rem;
   }
 
+  /* Light Mode Override - Traditional Card */
+  :not(.dark) .glass-card {
+    background: #FFFFFF !important;
+    border: 1px solid rgba(46, 125, 50, 0.1) !important;
+    box-shadow:
+            0 2px 8px rgba(46, 125, 50, 0.06),
+            0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Dark Mode - Glass Navbar */
   .glass-navbar {
     @apply bg-black/20 backdrop-blur-xl border-b border-white/[0.08];
   }
 
+  /* Light Mode - Traditional Navbar */
+  :not(.dark) .glass-navbar {
+    background: #FFFFFF;
+    border-bottom: 1px solid rgba(46, 125, 50, 0.15);
+    box-shadow: 0 2px 8px rgba(46, 125, 50, 0.08);
+    backdrop-filter: none;
+  }
+
+  /* Dark Mode - Glass Sidebar */
   .glass-sidebar {
     @apply bg-black/20 backdrop-blur-xl border-r border-white/[0.08];
   }
 
+  /* Light Mode - Traditional Sidebar */
+  :not(.dark) .glass-sidebar {
+    background: #FFFFFF;
+    border-right: 1px solid rgba(46, 125, 50, 0.15);
+    box-shadow: 2px 0 12px rgba(46, 125, 50, 0.08);
+    backdrop-filter: none;
+  }
+
+  /* Dark Mode - Glass Input */
   .glass-input {
     @apply bg-white/[0.06] border border-white/[0.08] text-white placeholder-white/50;
   }
 
-  .holographic-text {
+  /* Light Mode - Traditional Input */
+  :not(.dark) .glass-input {
+    background: #FFFFFF;
+    border: 1.5px solid rgba(46, 125, 50, 0.2);
+    color: #263238;
+    backdrop-filter: none;
+  }
+
+  :not(.dark) .glass-input::placeholder {
+    color: #607D8B;
+    opacity: 0.6;
+  }
+
+  :not(.dark) .glass-input:focus {
+    border-color: #2E7D32;
+    box-shadow:
+            0 0 0 3px rgba(46, 125, 50, 0.1),
+            0 2px 8px rgba(46, 125, 50, 0.08);
+  }
+
+  /* Dark Mode - Holographic Text */
+  .dark .holographic-text {
     background: linear-gradient(
-      90deg,
-      #00ff88,
-      #00d9ff,
-      #8a2be2,
-      #00ff88
+            90deg,
+            #00ff88,
+            #00d9ff,
+            #8a2be2,
+            #00ff88
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: hologram 3s linear infinite;
+  }
+
+  /* Light Mode - Traditional Green Gradient Text */
+  :not(.dark) .holographic-text {
+    background: linear-gradient(
+            90deg,
+            #2E7D32,
+            #66BB6A,
+            #F9A825,
+            #2E7D32
     );
     background-size: 200% auto;
     -webkit-background-clip: text;
