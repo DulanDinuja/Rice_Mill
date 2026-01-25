@@ -6,7 +6,6 @@ import { ROUTES } from '../../utils/constants';
 const GamingSidebar = () => {
   const { logout } = useAuth();
 
-
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: ROUTES.DASHBOARD },
     { icon: Package, label: 'Rice Stock', path: ROUTES.RICE_STOCK },
@@ -17,45 +16,51 @@ const GamingSidebar = () => {
   ];
 
   return (
-    <aside className="glass-sidebar w-64 min-h-screen fixed left-0 top-0 z-40 bg-white dark:bg-transparent">
+    <aside className="glass-sidebar w-64 min-h-screen fixed left-0 top-0 z-40">
       <div className="p-6">
         <h1 className="text-4xl font-gaming font-bold holographic-text">
           SAMEERA RICE
         </h1>
-        <p className="text-xs mt-1 text-green-700 dark:text-primary-400">Inventory System</p>
+        <p className="text-xs mt-1 text-light-primary dark:text-primary-400 font-medium">Inventory System</p>
       </div>
 
-      <nav className="px-3 space-y-1">
+      <nav className="px-3 space-y-2">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) => `
-              flex items-center gap-3 px-4 py-3 rounded-lg
+              flex items-center gap-3 px-4 py-3 rounded-xl
               transition-all duration-300
               ${isActive 
-                ? 'border-l-4 bg-primary-500/20 text-primary-600 dark:text-primary-400 border-primary-500' 
-                : 'text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-primary-600 dark:hover:text-primary-400'
+                ? 'bg-gradient-to-r from-green-50 to-green-100 dark:from-primary-500/25 dark:to-primary-600/20 text-green-900 dark:text-primary-300 border-l-4 border-light-primary dark:border-primary-400 shadow-md dark:shadow-primary-500/20 font-semibold' 
+                : 'text-light-textMuted dark:text-gray-300 bg-light-background dark:bg-white/[0.03] hover:bg-gradient-to-r hover:from-green-50 hover:to-light-background dark:hover:bg-white/10 hover:text-light-primary dark:hover:text-primary-300 hover:shadow-md hover:-translate-y-0.5 shadow-sm border border-transparent hover:border-green-100 dark:hover:border-transparent'
               }
             `}
           >
-            <item.icon size={20} />
+            <item.icon size={20} className="flex-shrink-0" />
             <span className="font-medium">{item.label}</span>
           </NavLink>
         ))}
       </nav>
 
-      <div className="absolute bottom-6 left-3 right-3 space-y-2">
+      <div className="absolute bottom-6 left-3 right-3 space-y-3">
         <button
           onClick={logout}
-          className="flex items-center gap-3 px-4 py-3 rounded-lg w-full
+          className="flex items-center gap-3 px-4 py-3 rounded-xl w-full
             transition-all duration-300
-            text-red-600 dark:text-red-400 hover:bg-red-500/10"
+            text-light-danger dark:text-red-300
+            bg-red-50 dark:bg-white/[0.03]
+            hover:bg-gradient-to-r hover:from-red-100 hover:to-red-50 dark:hover:bg-red-500/20
+            border border-red-200 dark:border-transparent
+            hover:shadow-md hover:-translate-y-0.5
+            font-medium shadow-sm"
         >
-          <LogOut size={20} />
-          <span className="font-medium">Logout</span>
+          <LogOut size={20} className="flex-shrink-0" />
+          <span>Logout</span>
         </button>
-        <p className="text-xs text-center text-gray-500 dark:text-gray-500">© Dulan Karunarathna</p>
+        <div className="h-px bg-gradient-to-r from-transparent via-green-100 dark:via-white/10 to-transparent" />
+        <p className="text-xs text-center text-light-textMuted dark:text-gray-400 font-medium">© Dulan Karunarathna</p>
       </div>
     </aside>
   );

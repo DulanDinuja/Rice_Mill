@@ -95,7 +95,7 @@ const RiceStock = () => {
       <GlassCard>
         <div className="mb-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#78909C] dark:text-gray-400" size={20} />
             <input
               type="text"
               placeholder="Search rice type..."
