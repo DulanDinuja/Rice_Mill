@@ -42,11 +42,20 @@ const GamingSidebar = () => {
           <X size={24} className="text-light-textMuted dark:text-gray-300" />
         </button>
 
-        <div className="p-6">
-          <h1 className="text-3xl md:text-4xl font-gaming font-bold holographic-text">
-            SAMEERA RICE
-          </h1>
-          <p className="text-xs mt-1 text-light-primary dark:text-primary-400 font-medium">Inventory System</p>
+        <div className="p-6 mt-[10px]">
+          <div className="flex items-center gap-0">
+            <img
+              src="/src/logo/logo.png"
+              alt="Sameera Rice Logo"
+              className="w-[120px] h-[120px] md:w-45 md:h-55 object-contain flex-shrink-0 -mt-5 -ml-[40px] md:-ml-[67px]"
+            />
+            <div className="-ml-[35px] md:-ml-[58px] mt-5">
+              <h1 className="text-3xl md:text-6xl lg:text-5xl font-['Brush_Script_MT'] font-normal italic tracking-tight whitespace-nowrap drop-shadow-lg animate-signature-color scale-x-85 scale-y-90" style={{ lineHeight: '1.8' }}>
+                ameera Rice
+              </h1>
+            </div>
+          </div>
+          <p className="text-xs mt-2 text-light-primary dark:text-primary-400 font-medium">Inventory System</p>
         </div>
 
         <nav className="px-3 space-y-2">

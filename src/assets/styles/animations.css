@@ -87,6 +87,18 @@
   }
 }
 
+@keyframes signature-color-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 .animate-neon-pulse {
   animation: neon-pulse 2s ease-in-out infinite;
 }
@@ -122,3 +134,37 @@
 .animate-cyber-spin {
   animation: cyber-spin 1s linear infinite;
 }
+
+.animate-signature-color {
+  background: linear-gradient(
+    90deg,
+    #2E7D32,
+    #4B91B3,
+    #F9A825,
+    #8B6914,
+    #2E7D32
+  );
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: signature-color-shift 8s ease-in-out infinite;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dark .animate-signature-color {
+    background: linear-gradient(
+      90deg,
+      #4CAF50,
+      #64B5D6,
+      #FBC02D,
+      #A68A3D,
+      #4CAF50
+    );
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+

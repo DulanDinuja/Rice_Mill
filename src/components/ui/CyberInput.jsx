@@ -45,17 +45,21 @@ const CyberInput = ({
                     className={`
             w-full ${sizes[size]} ${variants[variant]}
             bg-white/70 dark:bg-black/40 backdrop-blur-md
-            !text-black dark:!text-white
-            !opacity-100
-            placeholder:!text-gray-500 dark:placeholder:!text-gray-400
+            text-gray-900 dark:text-white
+            placeholder:text-gray-500 dark:placeholder:text-gray-400
             transition-all duration-200 ease-out
             focus:outline-none 
             focus:ring-2 focus:ring-light-primary/20 dark:focus:ring-primary-400/20
             focus:border-light-primary dark:focus:border-primary-400
+            [color-scheme:light] dark:[color-scheme:dark]
             ${Icon ? 'pl-11' : ''}
             ${error ? 'border-red-500/50 focus:border-red-500 dark:border-red-400/50 dark:focus:border-red-400 focus:ring-red-500/20 dark:focus:ring-red-400/20' : ''}
             ${className}
           `}
+                    style={{
+                        WebkitTextFillColor: 'inherit',
+                        WebkitOpacity: 1,
+                    }}
                     {...props}
                 />
             </div>

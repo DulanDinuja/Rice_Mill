@@ -37,11 +37,18 @@ const Login = () => {
         className="w-full max-w-md"
       >
         <div className="glass-card rounded-2xl p-8 space-y-6">
-          <div className="text-center">
-            <h1 className="text-4xl font-gaming font-bold holographic-text mb-2">
-              SAMEERA RICE
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">Inventory Management System</p>
+          <div className="text-right">
+            <div className="flex items-center justify-end mr-[35px] gap-0 mb-2">
+              <img
+                src="/src/logo/logo.png"
+                alt="Sameera Rice Logo"
+                className="w-[198px] h-[198px] md:w-[200px] md:h-[210px] object-contain flex-shrink-0"
+              />
+              <h1 className="text-6xl md:text-7xl font-['Brush_Script_MT'] font-normal italic tracking-tight whitespace-nowrap drop-shadow-lg animate-signature-color scale-x-85 scale-y-90 -ml-[69px] mt-[38px]" style={{ lineHeight: '1.8' }}>
+                ameera Rice
+              </h1>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 mr-[75px]">Inventory Management System</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
