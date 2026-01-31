@@ -7,6 +7,7 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
   const [formData, setFormData] = useState({
     stockId: '',
     customerName: '',
+    customerId: '',
     customerPhone: '',
     quantity: '',
     pricePerKg: '',
@@ -46,6 +47,7 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
     setFormData({
       stockId: '',
       customerName: '',
+      customerId: '',
       customerPhone: '',
       quantity: '',
       pricePerKg: '',
@@ -97,6 +99,22 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
           </div>
           <div>
             <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Customer ID
+            </label>
+            <input
+              type="text"
+              name="customerId"
+              value={formData.customerId}
+              onChange={handleInputChange}
+              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
+              placeholder="Enter customer ID"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+          <div>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Phone Number
             </label>
             <input
@@ -108,6 +126,7 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
               placeholder="Enter phone number"
             />
           </div>
+          <div></div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">

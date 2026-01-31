@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Plus, Download, ShoppingCart } from 'lucide-react';
+import { Plus, Download, ShoppingCart, Wheat } from 'lucide-react';
 import GlassCard from '../components/ui/GlassCard';
 import NeonButton from '../components/ui/NeonButton';
 import HolographicBadge from '../components/ui/HolographicBadge';
 import AddPaddyStockModal from '../components/modals/AddPaddyStockModal';
 import ExportModal from '../components/modals/ExportModal';
 import SaleModal from '../components/modals/SaleModal';
+import ThreshingModal from '../components/modals/ThreshingModal';
 import { stockService } from '../services/api/stockService';
 import { exportService } from '../services/exportService';
 import { salesService } from '../services/salesService';
@@ -16,6 +17,7 @@ const PaddyStock = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isSaleModalOpen, setIsSaleModalOpen] = useState(false);
+  const [isThreshingModalOpen, setIsThreshingModalOpen] = useState(false);
 
   useEffect(() => {
     loadStocks();
@@ -52,6 +54,35 @@ const PaddyStock = () => {
     }
   };
 
+  const handleThreshingComplete = async (threshingData) => {
+    try {
+      // Update paddy stock (reduce quantity)
+      await salesService.updateStockAfterSale(
+        threshingData.paddyStockId,
+        threshingData.paddyQuantity,
+        'paddy'
+      );
+
+      // Add rice stock
+      await stockService.addRiceStock({
+        riceType: threshingData.riceType,
+        quantity: threshingData.riceQuantity,
+        unit: 'kg',
+        warehouse: threshingData.warehouse,
+        grade: threshingData.riceGrade,
+        pricePerKg: 0, // Price can be set later
+        status: 'In Stock'
+      });
+
+      // Reload stocks
+      loadStocks();
+
+      console.log('Threshing completed:', threshingData);
+    } catch (error) {
+      console.error('Threshing failed:', error);
+    }
+  };
+
   const getMobileStatusText = (status) => {
     const mobileTextMap = {
       'In Stock': 'In',
@@ -69,6 +100,10 @@ const PaddyStock = () => {
           <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">Manage your paddy inventory</p>
         </div>
         <div className="flex flex-wrap gap-2 md:gap-3">
+          <NeonButton variant="outline" onClick={() => setIsThreshingModalOpen(true)} className="flex-1 sm:flex-none">
+            <Wheat size={20} />
+            <span className="hidden sm:inline">Threshing</span>
+          </NeonButton>
           <NeonButton variant="outline" onClick={() => setIsSaleModalOpen(true)} className="flex-1 sm:flex-none">
             <ShoppingCart size={20} />
             <span className="hidden sm:inline">New Sale</span>
@@ -133,6 +168,13 @@ const PaddyStock = () => {
         onStockAdded={handleStockAdded}
       />
       
+      <ThreshingModal
+        isOpen={isThreshingModalOpen}
+        onClose={() => setIsThreshingModalOpen(false)}
+        paddyStocks={stocks}
+        onThreshingComplete={handleThreshingComplete}
+      />
+
       <SaleModal
         isOpen={isSaleModalOpen}
         onClose={() => setIsSaleModalOpen(false)}
