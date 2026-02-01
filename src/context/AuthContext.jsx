@@ -16,15 +16,33 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    // Mock login
+    // Mock login - accepts username or email
     const mockUser = {
       id: 1,
       name: 'Admin User',
-      email: credentials.email,
+      email: credentials.emailOrUsername,
       role: 'admin'
     };
     const mockToken = 'mock-jwt-token-' + Date.now();
     
+    localStorage.setItem('user', JSON.stringify(mockUser));
+    localStorage.setItem('access_token', mockToken);
+    setUser(mockUser);
+    return { success: true };
+  };
+
+  const register = async (userData) => {
+    // Mock register
+    const mockUser = {
+      id: Date.now(),
+      name: userData.name,
+      email: userData.email,
+      idNumber: userData.idNumber,
+      mobileNumber: userData.mobileNumber,
+      role: 'user'
+    };
+    const mockToken = 'mock-jwt-token-' + Date.now();
+
     localStorage.setItem('user', JSON.stringify(mockUser));
     localStorage.setItem('access_token', mockToken);
     setUser(mockUser);
@@ -38,7 +56,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

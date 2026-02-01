@@ -1,17 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, User, CreditCard, Phone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CyberInput from '../components/ui/CyberInput';
 import NeonButton from '../components/ui/NeonButton';
 import toast from 'react-hot-toast';
 
 const Login = () => {
+  const [isRegister, setIsRegister] = useState(false);
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const [idNumber, setIdNumber] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -19,11 +25,21 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await login({ email, password });
-      toast.success('Login successful!');
+      if (isRegister) {
+        if (password !== confirmPassword) {
+          toast.error('Passwords do not match');
+          setLoading(false);
+          return;
+        }
+        await register({ name, email, password, idNumber, mobileNumber });
+        toast.success('Registration successful!');
+      } else {
+        await login({ emailOrUsername, password });
+        toast.success('Login successful!');
+      }
       navigate('/');
     } catch (error) {
-      toast.error('Login failed. Please try again.');
+      toast.error(isRegister ? 'Registration failed. Please try again.' : 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -52,13 +68,49 @@ const Login = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {isRegister && (
+              <CyberInput
+                label="Name"
+                type="text"
+                icon={User}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your Name"
+                required
+              />
+            )}
+
+            {isRegister && (
+              <CyberInput
+                label="ID Number"
+                type="text"
+                icon={CreditCard}
+                value={idNumber}
+                onChange={(e) => setIdNumber(e.target.value)}
+                placeholder="Your ID Number"
+                required
+              />
+            )}
+
+            {isRegister && (
+              <CyberInput
+                label="Mobile Number"
+                type="tel"
+                icon={Phone}
+                value={mobileNumber}
+                onChange={(e) => setMobileNumber(e.target.value)}
+                placeholder="+94 XX XXX XXXX"
+                required
+              />
+            )}
+
             <CyberInput
-              label="Email"
-              type="email"
+              label={isRegister ? "Email" : "Username or Email"}
+              type={isRegister ? "email" : "text"}
               icon={Mail}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@sameera.com"
+              value={isRegister ? email : emailOrUsername}
+              onChange={(e) => isRegister ? setEmail(e.target.value) : setEmailOrUsername(e.target.value)}
+              placeholder={isRegister ? "your.email@example.com" : "Username or Email"}
               required
             />
 
@@ -72,17 +124,40 @@ const Login = () => {
               required
             />
 
+            {isRegister && (
+              <CyberInput
+                label="Confirm Password"
+                type="password"
+                icon={Lock}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+            )}
+
             <NeonButton
               type="submit"
               loading={loading}
               className="w-full"
             >
-              Login
+              {isRegister ? 'Register' : 'Login'}
             </NeonButton>
           </form>
 
-          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-            Demo: admin@sameera.com / any password
+          <div className="text-center space-y-2">
+            <button
+              type="button"
+              onClick={() => setIsRegister(!isRegister)}
+              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+            >
+              {isRegister ? 'Already have an account? Login' : "Don't have an account? Register"}
+            </button>
+            {!isRegister && (
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Demo: admin / any password
+              </div>
+            )}
           </div>
         </div>
       </motion.div>
