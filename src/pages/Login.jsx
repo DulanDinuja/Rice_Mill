@@ -56,7 +56,7 @@ const Login = () => {
           <div className="text-right">
             <div className="flex items-center justify-end mr-[15px] sm:mr-[25px] md:mr-[35px] gap-0 mb-2">
               <img
-                src="/src/logo/logo.png"
+                src="/logo.png"
                 alt="Sameera Rice Logo"
                 className="w-[140px] h-[140px] sm:w-[170px] sm:h-[170px] md:w-[198px] md:h-[198px] lg:w-[200px] lg:h-[210px] object-contain flex-shrink-0"
               />

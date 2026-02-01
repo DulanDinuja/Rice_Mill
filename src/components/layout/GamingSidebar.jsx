@@ -48,7 +48,7 @@ const GamingSidebar = () => {
           <div className="p-3 sm:p-4 md:p-6 mt-2 md:mt-[10px]">
           <div className="flex items-center gap-0">
             <img
-              src="/src/logo/logo.png"
+              src="/logo.png"
               alt="Sameera Rice Logo"
               className="w-[80px] h-[80px] sm:w-[90px] sm:h-[90px] md:w-[120px] md:h-[120px] lg:w-45 lg:h-55 object-contain flex-shrink-0 -mt-3 sm:-mt-5 -ml-[28px] sm:-ml-[18px] md:-ml-[40px] lg:-ml-[47px]"
             />
