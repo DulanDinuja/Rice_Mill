@@ -72,7 +72,7 @@ const GamingSidebar = () => {
                 transition-all duration-300
                 ${isActive 
                   ? 'bg-gradient-to-r from-green-50 to-green-100 dark:from-primary-500/25 dark:to-primary-600/20 text-green-900 dark:text-primary-300 border-l-4 border-light-primary dark:border-primary-400 shadow-md dark:shadow-primary-500/20 font-semibold' 
-                  : 'text-light-textMuted dark:text-gray-300 bg-light-background dark:bg-white/[0.03] hover:bg-gradient-to-r hover:from-green-50 hover:to-light-background dark:hover:bg-white/10 hover:text-light-primary dark:hover:text-primary-300 hover:shadow-md hover:-translate-y-0.5 shadow-sm border border-transparent hover:border-green-100 dark:hover:border-transparent'
+                  : 'text-light-textMuted dark:text-gray-300 bg-light-background dark:bg-white/[0.03] hover:bg-gradient-to-r hover:from-green-50 hover:to-light-background dark:hover:from-green-500/20 dark:hover:to-green-600/10 hover:text-light-primary dark:hover:text-green-300 hover:shadow-md hover:-translate-y-0.5 shadow-sm border border-transparent hover:border-green-100 dark:hover:border-green-500/30'
                 }
               `}
             >
