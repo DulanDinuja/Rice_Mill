@@ -8,20 +8,17 @@ export const STOCK_STATUS = {
 };
 
 export const RICE_TYPES = [
-  'Basmati',
-  'Jasmine',
-  'Sona Masoori',
-  'Ponni',
-  'Brown Rice',
-  'Red Rice',
-  'Black Rice'
+  'White Raw',
+  'Steam Nadu',
+  'Steam Keeri',
+  'Red Raw',
+  'Keeri White Raw'
 ];
 
 export const PADDY_TYPES = [
-  'Raw Paddy',
-  'Boiled Paddy',
-  'Organic Paddy',
-  'Hybrid Paddy'
+  'Nadu',
+  'Keeri Samba',
+  'Samba'
 ];
 
 export const UNITS = ['kg', 'ton', 'quintal', 'bags'];
