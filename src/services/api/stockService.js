@@ -62,13 +62,14 @@ export const stockService = {
         ...stockData,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString(),
         status: 'In Stock'
       };
       stocks.push(newStock);
       localStorageService.saveRiceStocks(stocks);
       return { data: newStock };
     }
-    return axiosInstance.post('/rice-stocks/add', stockData);
+    return axiosInstance.post('/v1/rice-stock/add', stockData);
   },
 
   saveRiceStock: async (stockData) => {

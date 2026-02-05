@@ -17,9 +17,14 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
     mobileNumber: '',
     status: 'In Stock'
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+    
     try {
       const response = await stockService.addRiceStock(formData);
       onStockAdded(response.data);
@@ -38,6 +43,9 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
       });
     } catch (error) {
       console.error('Failed to add stock:', error);
+      setError(error.response?.data?.message || 'Failed to add stock. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -48,6 +56,12 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Add Rice Stock">
       <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
+            <p className="text-sm">{error}</p>
+          </div>
+        )}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
             <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rice Type</label>
@@ -183,11 +197,21 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
         </div>
 
         <div className="flex flex-col sm:flex-row justify-end gap-2 md:gap-3 pt-4">
-          <NeonButton variant="outline" type="button" onClick={onClose} className="w-full sm:w-auto">
+          <NeonButton 
+            variant="outline" 
+            type="button" 
+            onClick={onClose} 
+            className="w-full sm:w-auto"
+            disabled={isSubmitting}
+          >
             Cancel
           </NeonButton>
-          <NeonButton type="submit" className="w-full sm:w-auto">
-            Add Stock
+          <NeonButton 
+            type="submit" 
+            className="w-full sm:w-auto"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Adding...' : 'Add Stock'}
           </NeonButton>
         </div>
       </form>
