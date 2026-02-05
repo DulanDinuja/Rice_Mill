@@ -114,7 +114,17 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
               placeholder="Enter mobile number"
             />
           </div>
-          <div></div>
+          <div>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bags</label>
+            <input
+              type="number"
+              name="bags"
+              value={formData.bags}
+              onChange={handleChange}
+              className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+              placeholder="Number of bags"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
