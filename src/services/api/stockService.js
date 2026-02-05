@@ -62,7 +62,8 @@ export const stockService = {
         ...stockData,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        status: 'In Stock'
+        lastUpdated: stockData.lastUpdated || new Date().toISOString(),
+        status: stockData.status || 'In Stock'
       };
       stocks.push(newStock);
       localStorageService.saveRiceStocks(stocks);
@@ -118,7 +119,8 @@ export const stockService = {
         ...stockData,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        status: 'In Stock'
+        lastUpdated: stockData.lastUpdated || new Date().toISOString(),
+        status: stockData.status || 'In Stock'
       };
       stocks.push(newStock);
       localStorageService.savePaddyStocks(stocks);

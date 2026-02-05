@@ -127,6 +127,8 @@ const RiceStock = () => {
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Warehouse</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Grade</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Price/kg</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Customer</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Contact</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Status</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Last Updated</th>
                 </tr>
@@ -143,6 +145,8 @@ const RiceStock = () => {
                       </HolographicBadge>
                     </td>
                     <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap">{formatCurrency(stock.pricePerKg)}</td>
+                    <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{stock.customerName || '-'}</td>
+                    <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{stock.mobileNumber || '-'}</td>
                     <td className="py-3 md:py-4 px-2 md:px-4">
                       <HolographicBadge status={getStatusBadge(stock.status)} size="xs" className="md:!px-3 md:!py-1.5 md:!text-sm">
                         <span className="md:hidden">{getMobileStatusText(stock.status)}</span>

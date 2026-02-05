@@ -15,13 +15,18 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
     customerName: '',
     customerId: '',
     mobileNumber: '',
+    bags: '',
     status: 'In Stock'
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await stockService.addRiceStock(formData);
+      const stockData = {
+        ...formData,
+        lastUpdated: new Date().toISOString()
+      };
+      const response = await stockService.addRiceStock(stockData);
       onStockAdded(response.data);
       onClose();
       setFormData({
@@ -34,6 +39,7 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded }) => {
         customerName: '',
         customerId: '',
         mobileNumber: '',
+        bags: '',
         status: 'In Stock'
       });
     } catch (error) {

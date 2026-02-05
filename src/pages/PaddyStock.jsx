@@ -10,7 +10,7 @@ import ThreshingModal from '../components/modals/ThreshingModal';
 import { stockService } from '../services/api/stockService';
 import { exportService } from '../services/exportService';
 import { salesService } from '../services/salesService';
-import { formatCurrency } from '../utils/formatters';
+import { formatCurrency, formatDate } from '../utils/formatters';
 
 const PaddyStock = () => {
   const [stocks, setStocks] = useState([]);
@@ -134,9 +134,11 @@ const PaddyStock = () => {
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Quantity</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Warehouse</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Moisture %</th>
-                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Supplier</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Price/kg</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Customer</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Contact</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Status</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Last Updated</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-transparent divide-y divide-gray-100 dark:divide-white/5">
@@ -146,14 +148,16 @@ const PaddyStock = () => {
                     <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap">{stock.quantity} {stock.unit}</td>
                     <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{stock.warehouse}</td>
                     <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap">{stock.moistureLevel}%</td>
-                    <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{stock.supplier}</td>
                     <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap">{formatCurrency(stock.pricePerKg)}</td>
+                    <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{stock.customerName || '-'}</td>
+                    <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{stock.mobileNumber || '-'}</td>
                     <td className="py-3 md:py-4 px-2 md:px-4">
                       <HolographicBadge status="success" size="xs" className="md:!px-3 md:!py-1.5 md:!text-sm">
                         <span className="md:hidden">{getMobileStatusText(stock.status)}</span>
                         <span className="hidden md:inline">{stock.status}</span>
                       </HolographicBadge>
                     </td>
+                    <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{formatDate(stock.lastUpdated)}</td>
                   </tr>
                 ))}
               </tbody>
