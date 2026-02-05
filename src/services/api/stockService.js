@@ -127,5 +127,35 @@ export const stockService = {
       return { data: newStock };
     }
     return axiosInstance.post('/paddy-stocks/add', stockData);
+  },
+
+  updatePaddyStock: async (id, data) => {
+    if (USE_MOCK) {
+      const stocks = localStorageService.getPaddyStocks();
+      const index = stocks.findIndex(stock => stock.id === id);
+      if (index !== -1) {
+        stocks[index] = {
+          ...stocks[index],
+          ...data,
+          id,
+          updatedAt: new Date().toISOString(),
+          lastUpdated: data.lastUpdated || new Date().toISOString()
+        };
+        localStorageService.savePaddyStocks(stocks);
+        return { data: stocks[index] };
+      }
+      return { data: { ...data, id } };
+    }
+    return axiosInstance.put(`/paddy-stocks/${id}`, data);
+  },
+
+  deletePaddyStock: async (id) => {
+    if (USE_MOCK) {
+      const stocks = localStorageService.getPaddyStocks();
+      const filteredStocks = stocks.filter(stock => stock.id !== id);
+      localStorageService.savePaddyStocks(filteredStocks);
+      return { data: { success: true } };
+    }
+    return axiosInstance.delete(`/paddy-stocks/${id}`);
   }
 };

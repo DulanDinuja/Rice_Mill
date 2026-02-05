@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Download, ShoppingCart, Wheat } from 'lucide-react';
+import { Plus, Download, ShoppingCart, Wheat, Edit, Trash2 } from 'lucide-react';
 import GlassCard from '../components/ui/GlassCard';
 import NeonButton from '../components/ui/NeonButton';
 import HolographicBadge from '../components/ui/HolographicBadge';
@@ -7,6 +7,7 @@ import AddPaddyStockModal from '../components/modals/AddPaddyStockModal';
 import ExportModal from '../components/modals/ExportModal';
 import SaleModal from '../components/modals/SaleModal';
 import ThreshingModal from '../components/modals/ThreshingModal';
+import DeleteConfirmModal from '../components/modals/DeleteConfirmModal';
 import { stockService } from '../services/api/stockService';
 import { exportService } from '../services/exportService';
 import { salesService } from '../services/salesService';
@@ -18,6 +19,10 @@ const PaddyStock = () => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isSaleModalOpen, setIsSaleModalOpen] = useState(false);
   const [isThreshingModalOpen, setIsThreshingModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedStock, setSelectedStock] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [stockToDelete, setStockToDelete] = useState(null);
 
   useEffect(() => {
     loadStocks();
@@ -92,6 +97,36 @@ const PaddyStock = () => {
     return mobileTextMap[status] || status;
   };
 
+  const handleEdit = (stock) => {
+    setSelectedStock(stock);
+    setIsEditModalOpen(true);
+  };
+
+  const handleStockUpdated = (updatedStock) => {
+    setStocks(prev => prev.map(stock =>
+      stock.id === updatedStock.id ? updatedStock : stock
+    ));
+  };
+
+  const handleDelete = (stock) => {
+    setStockToDelete(stock);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async (reason) => {
+    if (stockToDelete) {
+      try {
+        await stockService.deletePaddyStock(stockToDelete.id);
+        setStocks(prev => prev.filter(stock => stock.id !== stockToDelete.id));
+        console.log('Stock deleted. Reason:', reason); // Log the reason
+        setIsDeleteModalOpen(false);
+        setStockToDelete(null);
+      } catch (error) {
+        console.error('Delete failed:', error);
+      }
+    }
+  };
+
   return (
     <div className="space-y-4 md:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -135,10 +170,11 @@ const PaddyStock = () => {
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Warehouse</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Moisture %</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Price/kg</th>
-                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Customer</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Supplier Name</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Contact</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Status</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Last Updated</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-transparent divide-y divide-gray-100 dark:divide-white/5">
@@ -158,6 +194,24 @@ const PaddyStock = () => {
                       </HolographicBadge>
                     </td>
                     <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{formatDate(stock.lastUpdated)}</td>
+                    <td className="py-3 md:py-4 px-2 md:px-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEdit(stock)}
+                          className="p-1.5 md:p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 transition-colors"
+                          title="Edit"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(stock)}
+                          className="p-1.5 md:p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -171,7 +225,20 @@ const PaddyStock = () => {
         onClose={() => setIsModalOpen(false)}
         onStockAdded={handleStockAdded}
       />
-      
+
+      {selectedStock && (
+        <AddPaddyStockModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedStock(null);
+          }}
+          onStockAdded={handleStockUpdated}
+          editMode={true}
+          initialData={selectedStock}
+        />
+      )}
+
       <ThreshingModal
         isOpen={isThreshingModalOpen}
         onClose={() => setIsThreshingModalOpen(false)}
@@ -192,6 +259,16 @@ const PaddyStock = () => {
         onClose={() => setIsExportModalOpen(false)}
         title="Paddy Stock"
         onExport={handleExport}
+      />
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setStockToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        itemName={stockToDelete ? `${stockToDelete.paddyType} (${stockToDelete.quantity} ${stockToDelete.unit})` : ''}
       />
     </div>
   );

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Download, ShoppingCart } from 'lucide-react';
+import { Plus, Search, Download, ShoppingCart, Edit, Trash2 } from 'lucide-react';
 import GlassCard from '../components/ui/GlassCard';
 import NeonButton from '../components/ui/NeonButton';
 import HolographicBadge from '../components/ui/HolographicBadge';
 import AddStockModal from '../components/modals/AddStockModal';
 import ExportModal from '../components/modals/ExportModal';
 import SaleModal from '../components/modals/SaleModal';
+import DeleteConfirmModal from '../components/modals/DeleteConfirmModal';
 import { stockService } from '../services/api/stockService';
 import { exportService } from '../services/exportService';
 import { salesService } from '../services/salesService';
@@ -17,6 +18,10 @@ const RiceStock = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isSaleModalOpen, setIsSaleModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedStock, setSelectedStock] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [stockToDelete, setStockToDelete] = useState(null);
 
   useEffect(() => {
     loadStocks();
@@ -75,6 +80,36 @@ const RiceStock = () => {
     }
   };
 
+  const handleEdit = (stock) => {
+    setSelectedStock(stock);
+    setIsEditModalOpen(true);
+  };
+
+  const handleStockUpdated = (updatedStock) => {
+    setStocks(prev => prev.map(stock =>
+      stock.id === updatedStock.id ? updatedStock : stock
+    ));
+  };
+
+  const handleDelete = (stock) => {
+    setStockToDelete(stock);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async (reason) => {
+    if (stockToDelete) {
+      try {
+        await stockService.deleteRiceStock(stockToDelete.id);
+        setStocks(prev => prev.filter(stock => stock.id !== stockToDelete.id));
+        console.log('Stock deleted. Reason:', reason); // Log the reason
+        setIsDeleteModalOpen(false);
+        setStockToDelete(null);
+      } catch (error) {
+        console.error('Delete failed:', error);
+      }
+    }
+  };
+
   return (
     <div className="space-y-4 md:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -124,13 +159,12 @@ const RiceStock = () => {
                 <tr className="border-b border-[#2E7D32]/20 dark:border-primary-500/20 bg-gray-50 dark:bg-white/[0.02]">
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Rice Type</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Quantity</th>
-                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Warehouse</th>
-                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Grade</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Price/kg</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Customer</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Contact</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Status</th>
                   <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Last Updated</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-transparent divide-y divide-gray-100 dark:divide-white/5">
@@ -138,12 +172,6 @@ const RiceStock = () => {
                   <tr key={stock.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                     <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white font-medium text-xs md:text-sm whitespace-nowrap">{stock.riceType}</td>
                     <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap">{stock.quantity} {stock.unit}</td>
-                    <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{stock.warehouse}</td>
-                    <td className="py-3 md:py-4 px-2 md:px-4">
-                      <HolographicBadge status="info" size="sm" className="md:px-3">
-                        {stock.grade}
-                      </HolographicBadge>
-                    </td>
                     <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap">{formatCurrency(stock.pricePerKg)}</td>
                     <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{stock.customerName || '-'}</td>
                     <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{stock.mobileNumber || '-'}</td>
@@ -154,6 +182,24 @@ const RiceStock = () => {
                       </HolographicBadge>
                     </td>
                     <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap">{formatDate(stock.lastUpdated)}</td>
+                    <td className="py-3 md:py-4 px-2 md:px-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEdit(stock)}
+                          className="p-1.5 md:p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 transition-colors"
+                          title="Edit"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(stock)}
+                          className="p-1.5 md:p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -167,7 +213,20 @@ const RiceStock = () => {
         onClose={() => setIsAddModalOpen(false)}
         onStockAdded={handleStockAdded}
       />
-      
+
+      {selectedStock && (
+        <AddStockModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedStock(null);
+          }}
+          onStockAdded={handleStockUpdated}
+          editMode={true}
+          initialData={selectedStock}
+        />
+      )}
+
       <SaleModal
         isOpen={isSaleModalOpen}
         onClose={() => setIsSaleModalOpen(false)}
@@ -181,6 +240,16 @@ const RiceStock = () => {
         onClose={() => setIsExportModalOpen(false)}
         title="Rice Stock"
         onExport={handleExport}
+      />
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setStockToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        itemName={stockToDelete ? `${stockToDelete.riceType} (${stockToDelete.quantity} ${stockToDelete.unit})` : ''}
       />
     </div>
   );
