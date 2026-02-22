@@ -18,6 +18,11 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, initia
   });
   const [updateComment, setUpdateComment] = useState('');
 
+  // Calculate total value automatically
+  const totalValue = formData.quantity && formData.pricePerKg
+    ? (parseFloat(formData.quantity) * parseFloat(formData.pricePerKg)).toFixed(2)
+    : '0.00';
+
   useEffect(() => {
     if (editMode && initialData) {
       setFormData({
@@ -39,6 +44,7 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, initia
     try {
       const stockData = {
         ...formData,
+        totalValue: parseFloat(totalValue),
         lastUpdated: new Date().toISOString()
       };
 
@@ -150,7 +156,7 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, initia
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity</label>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity (kg)</label>
             <input
               type="number"
               name="quantity"
@@ -159,19 +165,6 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, initia
               className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
               required
             />
-          </div>
-          <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Unit</label>
-            <select
-              name="unit"
-              value={formData.unit}
-              onChange={handleChange}
-              className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
-            >
-              {UNITS.map(unit => (
-                <option key={unit} value={unit} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">{unit}</option>
-              ))}
-            </select>
           </div>
           <div>
             <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price per kg</label>
@@ -185,6 +178,16 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, initia
               required
             />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Total Value (Bill)</label>
+          <input
+            type="text"
+            value={`Rs. ${totalValue}`}
+            disabled
+            className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white font-semibold cursor-not-allowed"
+          />
         </div>
 
         {editMode && (

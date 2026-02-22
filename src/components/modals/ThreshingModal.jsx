@@ -2,17 +2,18 @@ import { useState } from 'react';
 import Modal from '../ui/Modal';
 import NeonButton from '../ui/NeonButton';
 import { Wheat } from 'lucide-react';
+import { PADDY_TYPES, RICE_TYPES } from '../../utils/constants';
 
-const ThreshingModal = ({ isOpen, onClose, paddyStocks, onThreshingComplete }) => {
+const ThreshingModal = ({ isOpen, onClose, onThreshingComplete }) => {
   const [formData, setFormData] = useState({
-    paddyStockId: '',
+    paddyType: '',
     paddyQuantity: '',
     riceType: '',
     riceQuantity: '',
-    riceGrade: 'A',
-    conversionRate: 65, // Default 65% conversion rate
+    brokenRiceType: '',
     brokenRiceQuantity: '',
-    huskQuantity: '',
+    polishRiceType: '',
+    polishRiceQuantity: '',
     warehouse: '',
     threshingDate: new Date().toISOString().split('T')[0],
     notes: ''
@@ -23,21 +24,10 @@ const ThreshingModal = ({ isOpen, onClose, paddyStocks, onThreshingComplete }) =
     setFormData(prev => {
       const updated = { ...prev, [name]: value };
 
-      // Auto-calculate rice quantity based on conversion rate
-      if (name === 'paddyQuantity' || name === 'conversionRate') {
-        const paddyQty = parseFloat(updated.paddyQuantity) || 0;
-        const rate = parseFloat(updated.conversionRate) || 0;
-        updated.riceQuantity = (paddyQty * rate / 100).toFixed(2);
-        updated.brokenRiceQuantity = (paddyQty * 0.05).toFixed(2); // 5% broken rice
-        updated.huskQuantity = (paddyQty - updated.riceQuantity - updated.brokenRiceQuantity).toFixed(2);
-      }
-
-      // Auto-fill warehouse when paddy stock is selected
-      if (name === 'paddyStockId') {
-        const selectedStock = paddyStocks.find(stock => stock.id === value);
-        if (selectedStock) {
-          updated.warehouse = selectedStock.warehouse;
-        }
+      // Auto-fill broken rice type and polish rice type when rice type is selected
+      if (name === 'riceType') {
+        updated.brokenRiceType = value;
+        updated.polishRiceType = value;
       }
 
       return updated;
@@ -48,14 +38,14 @@ const ThreshingModal = ({ isOpen, onClose, paddyStocks, onThreshingComplete }) =
     e.preventDefault();
     onThreshingComplete(formData);
     setFormData({
-      paddyStockId: '',
+      paddyType: '',
       paddyQuantity: '',
       riceType: '',
       riceQuantity: '',
-      riceGrade: 'A',
-      conversionRate: 65,
+      brokenRiceType: '',
       brokenRiceQuantity: '',
-      huskQuantity: '',
+      polishRiceType: '',
+      polishRiceQuantity: '',
       warehouse: '',
       threshingDate: new Date().toISOString().split('T')[0],
       notes: ''
@@ -63,106 +53,79 @@ const ThreshingModal = ({ isOpen, onClose, paddyStocks, onThreshingComplete }) =
     onClose();
   };
 
-  const selectedStock = paddyStocks.find(stock => stock.id === formData.paddyStockId);
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Threshing Paddy">
       <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
-        {/* Paddy Selection */}
+        {/* Paddy Type Selection */}
         <div>
           <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Select Paddy Stock
+            Paddy Type
           </label>
           <select
-            name="paddyStockId"
-            value={formData.paddyStockId}
+            name="paddyType"
+            value={formData.paddyType}
             onChange={handleInputChange}
             required
             className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
           >
-            <option value="" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Choose paddy stock...</option>
-            {paddyStocks.map(stock => (
-              <option key={stock.id} value={stock.id} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">
-                {stock.paddyType} - {stock.quantity} {stock.unit} ({stock.warehouse})
-              </option>
+            <option value="" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Select paddy type...</option>
+            {PADDY_TYPES.map(type => (
+              <option key={type} value={type} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">{type}</option>
             ))}
           </select>
         </div>
 
-        {/* Paddy Quantity & Conversion Rate */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-          <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Paddy Quantity (kg)
-            </label>
-            <input
-              type="number"
-              name="paddyQuantity"
-              value={formData.paddyQuantity}
-              onChange={handleInputChange}
-              required
-              min="0.1"
-              step="0.1"
-              max={selectedStock?.quantity || 999999}
-              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
-              placeholder="Enter quantity"
-            />
-            {selectedStock && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Available: {selectedStock.quantity} {selectedStock.unit}
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Conversion Rate (%)
-            </label>
-            <input
-              type="number"
-              name="conversionRate"
-              value={formData.conversionRate}
-              onChange={handleInputChange}
-              required
-              min="50"
-              max="80"
-              step="0.1"
-              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
-              placeholder="Conversion rate"
-            />
-          </div>
+        {/* Paddy Quantity */}
+        <div>
+          <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Paddy Quantity (kg)
+          </label>
+          <input
+            type="number"
+            name="paddyQuantity"
+            value={formData.paddyQuantity}
+            onChange={handleInputChange}
+            required
+            min="0.1"
+            step="0.1"
+            className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
+            placeholder="Enter quantity"
+          />
         </div>
 
-        {/* Rice Type & Grade */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-          <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Rice Type
-            </label>
-            <input
-              type="text"
-              name="riceType"
-              value={formData.riceType}
-              onChange={handleInputChange}
-              required
-              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
-              placeholder="Enter rice type"
-            />
-          </div>
-          <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Rice Grade
-            </label>
-            <select
-              name="riceGrade"
-              value={formData.riceGrade}
-              onChange={handleInputChange}
-              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
-            >
-              <option value="A" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Grade A</option>
-              <option value="B" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Grade B</option>
-              <option value="C" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Grade C</option>
-            </select>
-          </div>
+        {/* Warehouse */}
+        <div>
+          <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Warehouse
+          </label>
+          <input
+            type="text"
+            name="warehouse"
+            value={formData.warehouse}
+            onChange={handleInputChange}
+            required
+            className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
+            placeholder="Warehouse location"
+          />
+        </div>
+
+        {/* Rice Type */}
+        <div>
+          <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Rice Type
+          </label>
+          <select
+            name="riceType"
+            value={formData.riceType}
+            onChange={handleInputChange}
+            required
+            className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+          >
+            <option value="" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Select rice type...</option>
+            {RICE_TYPES.map(type => (
+              <option key={type} value={type} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">{type}</option>
+            ))}
+          </select>
         </div>
 
         {/* Rice Quantity & Broken Rice */}
@@ -180,12 +143,32 @@ const ThreshingModal = ({ isOpen, onClose, paddyStocks, onThreshingComplete }) =
               min="0"
               step="0.01"
               className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
-              placeholder="Auto-calculated"
+              placeholder="Enter rice quantity"
             />
+          </div>
+        </div>
+
+        {/* Broken Rice Type & Quantity */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+          <div>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Broken Rice Type
+            </label>
+            <select
+              name="brokenRiceType"
+              value={formData.brokenRiceType}
+              onChange={handleInputChange}
+              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+            >
+              <option value="" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Select broken rice type...</option>
+              {RICE_TYPES.map(type => (
+                <option key={type} value={type} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">{type}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Broken Rice (kg)
+              Broken Rice Quantity (kg)
             </label>
             <input
               type="number"
@@ -195,40 +178,42 @@ const ThreshingModal = ({ isOpen, onClose, paddyStocks, onThreshingComplete }) =
               min="0"
               step="0.01"
               className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
-              placeholder="Auto-calculated"
+              placeholder="Enter broken rice quantity"
             />
           </div>
         </div>
 
-        {/* Husk Quantity & Warehouse */}
+        {/* Polish Rice Type & Quantity */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
             <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Husk Quantity (kg)
+              Polish Rice Type
+            </label>
+            <select
+              name="polishRiceType"
+              value={formData.polishRiceType}
+              onChange={handleInputChange}
+              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+            >
+              <option value="" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Select polish rice type...</option>
+              {RICE_TYPES.map(type => (
+                <option key={type} value={type} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">{type}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Polish Rice Quantity (kg)
             </label>
             <input
               type="number"
-              name="huskQuantity"
-              value={formData.huskQuantity}
+              name="polishRiceQuantity"
+              value={formData.polishRiceQuantity}
               onChange={handleInputChange}
               min="0"
               step="0.01"
               className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
-              placeholder="Auto-calculated"
-            />
-          </div>
-          <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Warehouse
-            </label>
-            <input
-              type="text"
-              name="warehouse"
-              value={formData.warehouse}
-              onChange={handleInputChange}
-              required
-              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
-              placeholder="Warehouse location"
+              placeholder="Enter polish rice quantity"
             />
           </div>
         </div>
@@ -272,18 +257,24 @@ const ThreshingModal = ({ isOpen, onClose, paddyStocks, onThreshingComplete }) =
                 <span className="text-gray-600 dark:text-gray-400">Paddy Input:</span>
                 <span className="text-gray-900 dark:text-white font-medium">{formData.paddyQuantity} kg</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Rice Output:</span>
-                <span className="text-gray-900 dark:text-white font-medium">{formData.riceQuantity} kg</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Broken Rice:</span>
-                <span className="text-gray-900 dark:text-white font-medium">{formData.brokenRiceQuantity} kg</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Husk:</span>
-                <span className="text-gray-900 dark:text-white font-medium">{formData.huskQuantity} kg</span>
-              </div>
+              {formData.riceQuantity && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Rice Output:</span>
+                  <span className="text-gray-900 dark:text-white font-medium">{formData.riceQuantity} kg</span>
+                </div>
+              )}
+              {formData.brokenRiceQuantity && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Broken Rice:</span>
+                  <span className="text-gray-900 dark:text-white font-medium">{formData.brokenRiceQuantity} kg</span>
+                </div>
+              )}
+              {formData.polishRiceQuantity && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Polish Rice:</span>
+                  <span className="text-gray-900 dark:text-white font-medium">{formData.polishRiceQuantity} kg</span>
+                </div>
+              )}
             </div>
           </div>
         )}

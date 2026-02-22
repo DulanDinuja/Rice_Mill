@@ -2,13 +2,18 @@ import { useState } from 'react';
 import Modal from '../ui/Modal';
 import NeonButton from '../ui/NeonButton';
 import { ShoppingCart } from 'lucide-react';
+import { RICE_TYPES, PADDY_TYPES } from '../../utils/constants';
 
 const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
   const [formData, setFormData] = useState({
+    riceType: '',
+    paddyType: '',
     stockId: '',
+    warehouse: '',
     customerName: '',
     customerId: '',
     customerPhone: '',
+    bags: '',
     quantity: '',
     pricePerKg: '',
     totalAmount: 0,
@@ -27,16 +32,6 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
         updated.totalAmount = qty * price;
       }
       
-      // Auto-fill price when stock is selected
-      if (name === 'stockId') {
-        const selectedStock = stockData.find(stock => stock.id === value);
-        if (selectedStock) {
-          updated.pricePerKg = selectedStock.pricePerKg;
-          const qty = parseFloat(updated.quantity) || 0;
-          updated.totalAmount = qty * selectedStock.pricePerKg;
-        }
-      }
-      
       return updated;
     });
   };
@@ -45,10 +40,14 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
     e.preventDefault();
     onSaleComplete(formData);
     setFormData({
+      riceType: '',
+      paddyType: '',
       stockId: '',
+      warehouse: '',
       customerName: '',
       customerId: '',
       customerPhone: '',
+      bags: '',
       quantity: '',
       pricePerKg: '',
       totalAmount: 0,
@@ -62,25 +61,61 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`New ${title} Sale`}>
       <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
-        <div>
-          <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Select {title}
-          </label>
-          <select
-            name="stockId"
-            value={formData.stockId}
-            onChange={handleInputChange}
-            required
-            className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
-          >
-            <option value="" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Choose {title.toLowerCase()}...</option>
-            {stockData.map(stock => (
-              <option key={stock.id} value={stock.id} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">
-                {title === 'Rice' ? stock.riceType : stock.paddyType} - {stock.quantity} {stock.unit} (Rs. {stock.pricePerKg}/kg)
-              </option>
-            ))}
-          </select>
-        </div>
+        {title === 'Rice' && (
+          <div>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Rice Type
+            </label>
+            <select
+              name="riceType"
+              value={formData.riceType}
+              onChange={handleInputChange}
+              required
+              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+            >
+              <option value="" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Select rice type...</option>
+              {RICE_TYPES.map(type => (
+                <option key={type} value={type} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">{type}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {title === 'Paddy' && (
+          <>
+            <div>
+              <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Paddy Type
+              </label>
+              <select
+                name="paddyType"
+                value={formData.paddyType}
+                onChange={handleInputChange}
+                required
+                className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+              >
+                <option value="" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Select paddy type...</option>
+                {PADDY_TYPES.map(type => (
+                  <option key={type} value={type} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">{type}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Warehouse
+              </label>
+              <input
+                type="text"
+                name="warehouse"
+                value={formData.warehouse}
+                onChange={handleInputChange}
+                required
+                className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
+                placeholder="Enter warehouse name"
+              />
+            </div>
+          </>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
@@ -126,7 +161,21 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
               placeholder="Enter phone number"
             />
           </div>
-          <div></div>
+          <div>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Bags
+            </label>
+            <input
+              type="number"
+              name="bags"
+              value={formData.bags}
+              onChange={handleInputChange}
+              min="0"
+              step="1"
+              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
+              placeholder="Number of bags"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
