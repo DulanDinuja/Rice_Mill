@@ -235,11 +235,13 @@ const ReportFilters = ({
           </div>
         )}
 
-        {/* Supplier Filter - Show only for paddy reports */}
-        {isPaddyReport && (
+        {/* Supplier/Customer Filter - Show for all reports except Paddy Threshing Report */}
+        {filters.reportType && filters.reportType !== REPORT_TYPES.PADDY_THRESHING && (
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-white/80">
-              Supplier (Optional)
+              {(filters.reportType === REPORT_TYPES.PADDY_SALE || filters.reportType === REPORT_TYPES.RICE_SALE)
+                ? 'Customer (Optional)'
+                : 'Supplier (Optional)'}
             </label>
             <select
               value={filters.supplier || ''}
@@ -250,7 +252,11 @@ const ReportFilters = ({
                        focus:border-green-500 dark:focus:border-primary-500
                        transition-all duration-200"
             >
-              <option value="" className="bg-white dark:bg-gray-800">All Suppliers</option>
+              <option value="" className="bg-white dark:bg-gray-800">
+                {(filters.reportType === REPORT_TYPES.PADDY_SALE || filters.reportType === REPORT_TYPES.RICE_SALE)
+                  ? 'All Customers'
+                  : 'All Suppliers'}
+              </option>
               {suppliers.map((supplier) => (
                 <option key={supplier} value={supplier} className="bg-white dark:bg-gray-800">
                   {supplier}
