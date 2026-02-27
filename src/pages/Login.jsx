@@ -40,8 +40,38 @@ const Login = () => {
         navigate('/');
       }
     } catch (error) {
-      const errorMsg = error.response?.data || error.message || (isRegister ? 'Registration failed' : 'Invalid credentials');
-      toast.error(errorMsg);
+      // Log the full error for debugging
+      console.log('Full error object:', error);
+      console.log('Error response:', error.response);
+      console.log('Error response data:', error.response?.data);
+
+      // Handle different error response formats
+      let errorMsg = 'An error occurred';
+
+      if (error.response?.data) {
+        const data = error.response.data;
+        if (typeof data === 'string') {
+          errorMsg = data;
+        } else if (data.message) {
+          errorMsg = data.message;
+        } else if (data.error) {
+          errorMsg = data.error;
+        }
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
+      console.log('Final error message:', errorMsg);
+
+      toast.error(errorMsg, {
+        duration: 4000,
+        style: {
+          background: '#ef4444',
+          color: '#fff',
+          padding: '16px',
+          borderRadius: '12px',
+        },
+      });
     } finally {
       setLoading(false);
     }

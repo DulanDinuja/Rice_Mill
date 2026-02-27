@@ -63,8 +63,8 @@ const CyberNavbar = () => {
             <User size={16} className="text-white" />
           </div>
           <div className="text-sm hidden md:block">
-            <p className="font-medium text-[#263238] dark:text-white">{user?.name}</p>
-            <p className="text-xs text-[#78909C] dark:text-gray-400">{user?.role}</p>
+            <p className="font-medium text-[#263238] dark:text-white">{user?.username || user?.name}</p>
+            <p className="text-xs text-[#78909C] dark:text-gray-400">{user?.role || user?.email}</p>
           </div>
         </div>
 
