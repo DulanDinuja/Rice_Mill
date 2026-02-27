@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import axiosInstance from '../services/api/axiosConfig';
 
 const AuthContext = createContext(null);
 
@@ -16,37 +17,55 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    // Mock login - accepts username or email
-    const mockUser = {
-      id: 1,
-      name: 'Admin User',
-      email: credentials.emailOrUsername,
-      role: 'admin'
-    };
-    const mockToken = 'mock-jwt-token-' + Date.now();
+    const response = await axiosInstance.post('/auth/login', {
+      username: credentials.emailOrUsername,
+      password: credentials.password
+    });
     
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    localStorage.setItem('access_token', mockToken);
-    setUser(mockUser);
-    return { success: true };
+    if (response.data === 'Login successful') {
+      const mockUser = {
+        id: 1,
+        name: credentials.emailOrUsername,
+        email: credentials.emailOrUsername,
+        role: 'admin'
+      };
+      const mockToken = 'jwt-token-' + Date.now();
+      
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      localStorage.setItem('access_token', mockToken);
+      setUser(mockUser);
+      return { success: true };
+    }
+    throw new Error('Login failed');
   };
 
   const register = async (userData) => {
-    // Mock register
-    const mockUser = {
-      id: Date.now(),
-      name: userData.name,
+    const response = await axiosInstance.post('/auth/register', {
+      username: userData.name,
       email: userData.email,
-      idNumber: userData.idNumber,
       mobileNumber: userData.mobileNumber,
-      role: 'user'
-    };
-    const mockToken = 'mock-jwt-token-' + Date.now();
+      nic: userData.idNumber,
+      password: userData.password,
+      confirmPassword: userData.confirmPassword
+    });
+    
+    if (response.data === 'User registered successfully') {
+      const mockUser = {
+        id: Date.now(),
+        name: userData.name,
+        email: userData.email,
+        idNumber: userData.idNumber,
+        mobileNumber: userData.mobileNumber,
+        role: 'user'
+      };
+      const mockToken = 'jwt-token-' + Date.now();
 
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    localStorage.setItem('access_token', mockToken);
-    setUser(mockUser);
-    return { success: true };
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      localStorage.setItem('access_token', mockToken);
+      setUser(mockUser);
+      return { success: true };
+    }
+    throw new Error(response.data || 'Registration failed');
   };
 
   const logout = () => {

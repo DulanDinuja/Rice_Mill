@@ -31,15 +31,17 @@ const Login = () => {
           setLoading(false);
           return;
         }
-        await register({ name, email, password, idNumber, mobileNumber });
+        await register({ name, email, password, confirmPassword, idNumber, mobileNumber });
         toast.success('Registration successful!');
+        navigate('/');
       } else {
         await login({ emailOrUsername, password });
         toast.success('Login successful!');
+        navigate('/');
       }
-      navigate('/');
     } catch (error) {
-      toast.error(isRegister ? 'Registration failed. Please try again.' : 'Login failed. Please try again.');
+      const errorMsg = error.response?.data || error.message || (isRegister ? 'Registration failed' : 'Invalid credentials');
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }

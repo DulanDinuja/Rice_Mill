@@ -2,7 +2,7 @@ import axiosInstance from './axiosConfig';
 import { mockRiceStocks, mockPaddyStocks } from '../mock/stockData';
 import { localStorageService } from '../localStorageService';
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export const stockService = {
   getRiceStocks: async () => {
