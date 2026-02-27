@@ -18,8 +18,8 @@ export const stockService = {
       axiosInstance.get('/rice/addstock'),
       axiosInstance.get('/rice/ricesale')
     ]);
-    const addStocks = (addStockRes.data || []).map(item => ({ ...item, transactionType: 'Add Stock', lastUpdated: item.date }));
-    const saleStocks = (saleStockRes.data || []).map(item => ({ ...item, transactionType: 'Sale', lastUpdated: item.date }));
+    const addStocks = (addStockRes.data || []).map(item => ({ ...item, transactionType: 'Add Stock', lastUpdated: item.date, uniqueId: `addstock-${item.id}` }));
+    const saleStocks = (saleStockRes.data || []).map(item => ({ ...item, transactionType: 'Sale', lastUpdated: item.date, uniqueId: `sale-${item.id}` }));
     return { data: [...addStocks, ...saleStocks] };
   },
 
@@ -48,7 +48,7 @@ export const stockService = {
     if (USE_MOCK) {
       return { data: { ...data, id } };
     }
-    return axiosInstance.put(`/rice-stocks/${id}`, data);
+    return axiosInstance.put(`/rice/addstock/${id}`, data);
   },
 
   deleteRiceStock: async (id) => {
@@ -82,6 +82,13 @@ export const stockService = {
       return { data: { id: Date.now(), ...saleData } };
     }
     return axiosInstance.post('/rice/ricesale', saleData);
+  },
+
+  updateRiceSale: async (id, saleData) => {
+    if (USE_MOCK) {
+      return { data: { id, ...saleData } };
+    }
+    return axiosInstance.put(`/rice/ricesale/${id}`, saleData);
   },
 
   saveRiceStock: async (stockData) => {

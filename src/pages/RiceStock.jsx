@@ -109,9 +109,7 @@ const RiceStock = () => {
   };
 
   const handleStockUpdated = (updatedStock) => {
-    setStocks(prev => prev.map(stock =>
-      stock.id === updatedStock.id ? updatedStock : stock
-    ));
+    loadStocks(); // Reload all stocks to get fresh data
   };
 
   const handleDelete = (stock) => {
@@ -208,7 +206,7 @@ const RiceStock = () => {
                   </thead>
                   <tbody className="bg-white dark:bg-transparent divide-y divide-gray-100 dark:divide-white/5">
                     {filteredStocks.map((stock) => (
-                      <tr key={stock.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                      <tr key={stock.uniqueId || stock.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white font-medium text-xs md:text-sm whitespace-nowrap w-[13%]">{stock.riceType}</td>
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap w-[12%]">{stock.quantity} kg</td>
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap w-[12%]">{formatCurrency(stock.pricePerKg)}</td>

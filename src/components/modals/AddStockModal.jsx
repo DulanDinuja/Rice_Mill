@@ -54,12 +54,23 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, initia
         status: formData.status,
         totalamount: parseFloat(totalValue),
         date: new Date().toISOString().split('T')[0],
-        user: user.username || user.name || ''
+        user: user.username || user.name || '',
+        note: updateComment
       };
 
       if (editMode && initialData) {
-        const response = await stockService.updateRiceStock(initialData.id, stockData);
-        onStockAdded({ ...response.data, id: initialData.id });
+        // Check if it's a Sale transaction or Add Stock transaction
+        const isSale = initialData.transactionType === 'Sale';
+        
+        if (isSale) {
+          // Call sale update API
+          const response = await stockService.updateRiceSale(initialData.id, stockData);
+          onStockAdded({ ...response.data, id: initialData.id });
+        } else {
+          // Call add stock update API
+          const response = await stockService.updateRiceStock(initialData.id, stockData);
+          onStockAdded({ ...response.data, id: initialData.id });
+        }
       } else {
         const response = await stockService.addRiceStock(stockData);
         onStockAdded(response.data);
@@ -106,6 +117,9 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, initia
               {RICE_TYPES.map(type => (
                 <option key={type} value={type} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">{type}</option>
               ))}
+              {editMode && initialData?.riceType && !RICE_TYPES.includes(initialData.riceType) && (
+                <option key={initialData.riceType} value={initialData.riceType} className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">{initialData.riceType}</option>
+              )}
             </select>
           </div>
           <div>
