@@ -42,16 +42,22 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, initia
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
       const stockData = {
-        ...formData,
-        totalValue: parseFloat(totalValue),
-        lastUpdated: new Date().toISOString()
+        riceType: formData.riceType,
+        quantity: parseInt(formData.quantity),
+        pricePerKg: parseFloat(formData.pricePerKg),
+        customerName: formData.customerName,
+        customerId: formData.customerId,
+        mobileNumber: formData.mobileNumber,
+        bags: parseInt(formData.bags) || 0,
+        status: formData.status,
+        totalamount: parseFloat(totalValue),
+        date: new Date().toISOString().split('T')[0],
+        user: user.username || user.name || ''
       };
 
       if (editMode && initialData) {
-        if (updateComment.trim()) {
-          console.log('Stock updated. Comment:', updateComment);
-        }
         const response = await stockService.updateRiceStock(initialData.id, stockData);
         onStockAdded({ ...response.data, id: initialData.id });
       } else {

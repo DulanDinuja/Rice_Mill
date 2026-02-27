@@ -7,16 +7,20 @@ const USE_MOCK = false;
 export const stockService = {
   getRiceStocks: async () => {
     if (USE_MOCK) {
-      // Try to get from localStorage first, fallback to mock data
       let stocks = localStorageService.getRiceStocks();
       if (stocks.length === 0) {
-        // Initialize with mock data if localStorage is empty
         localStorageService.saveRiceStocks(mockRiceStocks);
         stocks = mockRiceStocks;
       }
       return { data: stocks };
     }
-    return axiosInstance.get('/rice-stocks');
+    const [addStockRes, saleStockRes] = await Promise.all([
+      axiosInstance.get('/rice/addstock'),
+      axiosInstance.get('/rice/ricesale')
+    ]);
+    const addStocks = (addStockRes.data || []).map(item => ({ ...item, transactionType: 'Add Stock', lastUpdated: item.date }));
+    const saleStocks = (saleStockRes.data || []).map(item => ({ ...item, transactionType: 'Sale', lastUpdated: item.date }));
+    return { data: [...addStocks, ...saleStocks] };
   },
 
   getPaddyStocks: async () => {
@@ -69,7 +73,15 @@ export const stockService = {
       localStorageService.saveRiceStocks(stocks);
       return { data: newStock };
     }
-    return axiosInstance.post('/rice-stocks/add', stockData);
+    const response = await axiosInstance.post('/rice/addstock', stockData);
+    return response;
+  },
+
+  addRiceSale: async (saleData) => {
+    if (USE_MOCK) {
+      return { data: { id: Date.now(), ...saleData } };
+    }
+    return axiosInstance.post('/rice/ricesale', saleData);
   },
 
   saveRiceStock: async (stockData) => {

@@ -83,8 +83,20 @@ const RiceStock = () => {
 
   const handleSaleComplete = async (saleData) => {
     try {
-      await salesService.createRiceSale(saleData);
-      await salesService.updateStockAfterSale(saleData.stockId, saleData.quantity, 'rice');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const payload = {
+        riceType: saleData.riceType,
+        quantity: parseInt(saleData.quantity),
+        pricePerKg: parseFloat(saleData.pricePerKg),
+        customerName: saleData.customerName,
+        customerId: saleData.customerId,
+        mobileNumber: saleData.customerPhone,
+        bags: parseInt(saleData.bags) || 0,
+        totalamount: parseFloat(saleData.totalAmount),
+        date: saleData.saleDate,
+        user: user.username || user.name || ''
+      };
+      await stockService.addRiceSale(payload);
       loadStocks();
     } catch (error) {
       console.error('Sale failed:', error);
@@ -169,14 +181,14 @@ const RiceStock = () => {
               <table className="min-w-full divide-y divide-gray-200 dark:divide-white/5">
                 <thead className="sticky top-0 z-10">
                   <tr className="border-b border-[#2E7D32]/20 dark:border-primary-500/20 bg-gray-50 dark:bg-white/[0.02]">
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Rice Type</th>
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[13%]">Rice Type</th>
                     <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Quantity (kg)</th>
                     <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Price/kg</th>
                     <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Customer</th>
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Contact</th>
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[10%]">Status</th>
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Last Updated</th>
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Actions</th>
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[13%]">Contact</th>
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Status</th>
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[13%]">Last Updated</th>
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[10%]">Actions</th>
                   </tr>
                 </thead>
               </table>
@@ -184,32 +196,31 @@ const RiceStock = () => {
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-white/5">
                   <thead className="invisible">
                     <tr>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Rice Type</th>
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[13%]">Rice Type</th>
                       <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Quantity (kg)</th>
                       <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Price/kg</th>
                       <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Customer</th>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Contact</th>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[10%]">Status</th>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Last Updated</th>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Actions</th>
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[13%]">Contact</th>
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Type</th>
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[13%]">Last Updated</th>
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[10%]">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-transparent divide-y divide-gray-100 dark:divide-white/5">
                     {filteredStocks.map((stock) => (
                       <tr key={stock.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">{stock.riceType}</td>
+                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white font-medium text-xs md:text-sm whitespace-nowrap w-[13%]">{stock.riceType}</td>
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap w-[12%]">{stock.quantity} kg</td>
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap w-[12%]">{formatCurrency(stock.pricePerKg)}</td>
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[15%]">{stock.customerName || '-'}</td>
-                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[12%]">{stock.mobileNumber || '-'}</td>
-                        <td className="py-3 md:py-4 px-2 md:px-4 w-[10%]">
-                          <HolographicBadge status={getStatusBadge(stock.status)} size="xs" className="!px-2 !py-1 !text-xs">
-                            <span className="md:hidden">{getMobileStatusText(stock.status)}</span>
-                            <span className="hidden md:inline">{stock.status}</span>
+                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[13%]">{stock.mobileNumber || '-'}</td>
+                        <td className="py-3 md:py-4 px-2 md:px-4 w-[12%]">
+                          <HolographicBadge status={stock.transactionType === 'Sale' ? 'info' : getStatusBadge(stock.status)} size="xs" className="!px-2 !py-1 !text-xs">
+                            {stock.transactionType || 'Add Stock'}
                           </HolographicBadge>
                         </td>
-                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[12%]">{formatDate(stock.lastUpdated)}</td>
-                        <td className="py-3 md:py-4 px-2 md:px-4 w-[15%]">
+                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[13%]">{formatDate(stock.lastUpdated)}</td>
+                        <td className="py-3 md:py-4 px-2 md:px-4 w-[10%]">
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleEdit(stock)}
