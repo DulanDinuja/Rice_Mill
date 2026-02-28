@@ -44,6 +44,7 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, initia
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       const isSale = editMode && initialData?.transactionType === 'Sale';
+      const isEditAddStock = editMode && initialData?.transactionType !== 'Sale';
       const stockData = {
         riceType: formData.riceType,
         quantity: parseInt(formData.quantity),
@@ -52,7 +53,7 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, initia
         customerId: formData.customerId,
         mobileNumber: formData.mobileNumber,
         bags: parseInt(formData.bags) || 0,
-        status: isSale ? 'U-sale' : 'In Stock',
+        status: isSale ? 'U-sale' : (isEditAddStock ? 'U-addstock' : 'addstock'),
         totalamount: parseFloat(totalValue),
         date: new Date().toISOString().split('T')[0],
         user: user.username || user.name || '',
