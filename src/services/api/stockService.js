@@ -25,16 +25,22 @@ export const stockService = {
 
   getPaddyStocks: async () => {
     if (USE_MOCK) {
-      // Try to get from localStorage first, fallback to mock data
       let stocks = localStorageService.getPaddyStocks();
       if (stocks.length === 0) {
-        // Initialize with mock data if localStorage is empty
         localStorageService.savePaddyStocks(mockPaddyStocks);
         stocks = mockPaddyStocks;
       }
       return { data: stocks };
     }
-    return axiosInstance.get('/paddy-stocks');
+    const [addStockRes, saleRes, threshingRes] = await Promise.all([
+      axiosInstance.get('/paddy/addstock'),
+      axiosInstance.get('/paddy/paddysale'),
+      axiosInstance.get('/paddy/paddythreshing')
+    ]);
+    const addStocks = (addStockRes.data || []).map(item => ({ ...item, transactionType: 'Add Stock', lastUpdated: item.date, uniqueId: `addstock-${item.id}` }));
+    const sales = (saleRes.data || []).map(item => ({ ...item, transactionType: 'Sale', lastUpdated: item.date, uniqueId: `sale-${item.id}` }));
+    const threshings = (threshingRes.data || []).map(item => ({ ...item, quantity: item.PaddyQuantity || item.paddyQuantity, transactionType: 'Threshing', lastUpdated: item.date, uniqueId: `threshing-${item.id}` }));
+    return { data: [...addStocks, ...sales, ...threshings] };
   },
 
   createRiceStock: async (data) => {
@@ -152,7 +158,21 @@ export const stockService = {
       localStorageService.savePaddyStocks(stocks);
       return { data: newStock };
     }
-    return axiosInstance.post('/paddy-stocks/add', stockData);
+    return axiosInstance.post('/paddy/addstock', stockData);
+  },
+
+  addPaddySale: async (saleData) => {
+    if (USE_MOCK) {
+      return { data: { id: Date.now(), ...saleData } };
+    }
+    return axiosInstance.post('/paddy/paddysale', saleData);
+  },
+
+  addPaddyThreshing: async (threshingData) => {
+    if (USE_MOCK) {
+      return { data: { id: Date.now(), ...threshingData } };
+    }
+    return axiosInstance.post('/paddy/paddythreshing', threshingData);
   },
 
   updatePaddyStock: async (id, data) => {
@@ -172,16 +192,44 @@ export const stockService = {
       }
       return { data: { ...data, id } };
     }
-    return axiosInstance.put(`/paddy-stocks/${id}`, data);
+    return axiosInstance.put(`/paddy/addstock/${id}`, data);
   },
 
-  deletePaddyStock: async (id) => {
+  updatePaddySale: async (id, data) => {
+    if (USE_MOCK) {
+      return { data: { id, ...data } };
+    }
+    return axiosInstance.put(`/paddy/paddysale/${id}`, data);
+  },
+
+  updatePaddyThreshing: async (id, data) => {
+    if (USE_MOCK) {
+      return { data: { id, ...data } };
+    }
+    return axiosInstance.put(`/paddy/paddythreshing/${id}`, data);
+  },
+
+  deletePaddyStock: async (id, deleteReason) => {
     if (USE_MOCK) {
       const stocks = localStorageService.getPaddyStocks();
       const filteredStocks = stocks.filter(stock => stock.id !== id);
       localStorageService.savePaddyStocks(filteredStocks);
       return { data: { success: true } };
     }
-    return axiosInstance.delete(`/paddy-stocks/${id}`);
+    return axiosInstance.delete(`/paddy/addstock/${id}`, { params: { deleteReason } });
+  },
+
+  deletePaddySale: async (id, deleteReason) => {
+    if (USE_MOCK) {
+      return { data: { success: true } };
+    }
+    return axiosInstance.delete(`/paddy/paddysale/${id}`, { params: { deleteReason } });
+  },
+
+  deletePaddyThreshing: async (id, deleteReason) => {
+    if (USE_MOCK) {
+      return { data: { success: true } };
+    }
+    return axiosInstance.delete(`/paddy/paddythreshing/${id}`, { params: { deleteReason } });
   }
 };

@@ -59,7 +59,7 @@ const PaddyStock = () => {
   });
 
   const handleStockAdded = (newStock) => {
-    setStocks(prevStocks => [...prevStocks, newStock]);
+    loadStocks();
   };
 
   const handleExport = async (options) => {
@@ -72,8 +72,22 @@ const PaddyStock = () => {
 
   const handleSaleComplete = async (saleData) => {
     try {
-      await salesService.createPaddySale(saleData);
-      await salesService.updateStockAfterSale(saleData.stockId, saleData.quantity, 'paddy');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const payload = {
+        paddyType: saleData.paddyType,
+        quantity: parseInt(saleData.quantity),
+        pricePerKg: parseFloat(saleData.pricePerKg),
+        customerName: saleData.customerName,
+        customerId: saleData.customerId,
+        mobileNumber: saleData.customerPhone,
+        bags: parseInt(saleData.bags) || 0,
+        warehouse: saleData.warehouse,
+        status: 'sale',
+        totalamount: parseFloat(saleData.totalAmount),
+        date: saleData.saleDate,
+        user: user.username || user.name || ''
+      };
+      await stockService.addPaddySale(payload);
       loadStocks();
     } catch (error) {
       console.error('Sale failed:', error);
@@ -82,28 +96,24 @@ const PaddyStock = () => {
 
   const handleThreshingComplete = async (threshingData) => {
     try {
-      // Update paddy stock (reduce quantity)
-      await salesService.updateStockAfterSale(
-        threshingData.paddyStockId,
-        threshingData.paddyQuantity,
-        'paddy'
-      );
-
-      // Add rice stock
-      await stockService.addRiceStock({
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const payload = {
+        paddyType: threshingData.paddyType,
+        PaddyQuantity: parseInt(threshingData.paddyQuantity),
         riceType: threshingData.riceType,
-        quantity: threshingData.riceQuantity,
-        unit: 'kg',
+        riceQuantity: parseInt(threshingData.riceQuantity),
+        brokenRiceType: threshingData.brokenRiceType || '',
+        brokenRiceQuantity: parseInt(threshingData.brokenRiceQuantity) || 0,
+        polishRiceType: threshingData.polishRiceType || '',
+        polishRiceQuantity: parseInt(threshingData.polishRiceQuantity) || 0,
         warehouse: threshingData.warehouse,
-        grade: threshingData.riceGrade,
-        pricePerKg: 0, // Price can be set later
-        status: 'In Stock'
-      });
-
-      // Reload stocks
+        notes: threshingData.notes || '',
+        status: 'threshing',
+        date: new Date().toISOString().split('T')[0],
+        user: user.username || user.name || ''
+      };
+      await stockService.addPaddyThreshing(payload);
       loadStocks();
-
-      console.log('Threshing completed:', threshingData);
     } catch (error) {
       console.error('Threshing failed:', error);
     }
@@ -123,10 +133,8 @@ const PaddyStock = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleStockUpdated = (updatedStock) => {
-    setStocks(prev => prev.map(stock =>
-      stock.id === updatedStock.id ? updatedStock : stock
-    ));
+  const handleStockUpdated = () => {
+    loadStocks();
   };
 
   const handleDelete = (stock) => {
@@ -137,9 +145,15 @@ const PaddyStock = () => {
   const confirmDelete = async (reason) => {
     if (stockToDelete) {
       try {
-        await stockService.deletePaddyStock(stockToDelete.id);
-        setStocks(prev => prev.filter(stock => stock.id !== stockToDelete.id));
-        console.log('Stock deleted. Reason:', reason); // Log the reason
+        const transactionType = stockToDelete.transactionType;
+        if (transactionType === 'Add Stock') {
+          await stockService.deletePaddyStock(stockToDelete.id, reason);
+        } else if (transactionType === 'Sale') {
+          await stockService.deletePaddySale(stockToDelete.id, reason);
+        } else if (transactionType === 'Threshing') {
+          await stockService.deletePaddyThreshing(stockToDelete.id, reason);
+        }
+        setStocks(prev => prev.filter(stock => stock.uniqueId !== stockToDelete.uniqueId));
         setIsDeleteModalOpen(false);
         setStockToDelete(null);
       } catch (error) {
@@ -199,20 +213,20 @@ const PaddyStock = () => {
             <div className="overflow-hidden">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-white/5">
                 <thead className="sticky top-0 z-10">
-                  <tr className="border-b border-[#66BB6A]/20 dark:border-secondary-500/20 bg-gray-50 dark:bg-white/[0.02]">
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Paddy Type</th>
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Quantity (kg)</th>
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Price/kg</th>
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Supplier Name</th>
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Contact</th>
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[10%]">Status</th>
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">
+                  <tr className="border-b border-[#2E7D32]/20 dark:border-primary-500/20 bg-gray-50 dark:bg-white/[0.02]">
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Paddy Type</th>
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Quantity (kg)</th>
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Price/kg</th>
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Customer</th>
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Contact</th>
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[10%]">Status</th>
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">
                       <button onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')} className="flex items-center gap-1 hover:opacity-70 transition-opacity">
                         Last Updated
                         {sortOrder === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
                       </button>
                     </th>
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Actions</th>
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Actions</th>
                   </tr>
                 </thead>
               </table>
@@ -220,33 +234,54 @@ const PaddyStock = () => {
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-white/5">
                   <thead className="invisible">
                     <tr>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Paddy Type</th>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Quantity (kg)</th>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Price/kg</th>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Supplier Name</th>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Contact</th>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[10%]">Status</th>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Paddy Type</th>
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Quantity (kg)</th>
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Price/kg</th>
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Supplier Name</th>
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Contact</th>
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[10%]">Status</th>
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">
                         <button onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')} className="flex items-center gap-1 hover:opacity-70 transition-opacity">
                           Last Updated
                           {sortOrder === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
                         </button>
                       </th>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Actions</th>
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#2E7D32] dark:text-primary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-transparent divide-y divide-gray-100 dark:divide-white/5">
                     {filteredStocks.map((stock) => (
-                      <tr key={stock.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                      <tr key={stock.uniqueId || stock.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">{stock.paddyType}</td>
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap w-[12%]">{stock.quantity} kg</td>
-                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap w-[12%]">{formatCurrency(stock.pricePerKg)}</td>
-                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[15%]">{stock.customerName || '-'}</td>
-                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[12%]">{stock.mobileNumber || '-'}</td>
+                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap w-[12%]">
+                          {stock.transactionType === 'Threshing' ? (
+                            <Wheat size={16} className="text-[#66BB6A]" />
+                          ) : (
+                            formatCurrency(stock.pricePerKg)
+                          )}
+                        </td>
+                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[15%]">
+                          {stock.transactionType === 'Threshing' ? (
+                            <Wheat size={16} className="text-[#66BB6A]" />
+                          ) : (
+                            stock.customerName || '-'
+                          )}
+                        </td>
+                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[12%]">
+                          {stock.transactionType === 'Threshing' ? (
+                            <Wheat size={16} className="text-[#66BB6A]" />
+                          ) : (
+                            stock.mobileNumber || '-'
+                          )}
+                        </td>
                         <td className="py-3 md:py-4 px-2 md:px-4 w-[10%]">
-                          <HolographicBadge status="success" size="xs" className="!px-2 !py-1 !text-xs">
-                            <span className="md:hidden">{getMobileStatusText(stock.status)}</span>
-                            <span className="hidden md:inline">{stock.status}</span>
+                          <HolographicBadge 
+                            status={(stock.status === 'U-addstock' || stock.status === 'U-sale' || stock.status === 'U-threshing') ? 'warning' : (stock.transactionType === 'Threshing' ? 'purple' : (stock.transactionType === 'Sale' ? 'info' : 'success'))} 
+                            size="xs" 
+                            className="!px-2 !py-1 !text-xs"
+                          >
+                            {stock.transactionType || 'Add Stock'}
                           </HolographicBadge>
                         </td>
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[12%]">{formatDate(stock.lastUpdated)}</td>

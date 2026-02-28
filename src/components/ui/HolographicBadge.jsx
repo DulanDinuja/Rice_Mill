@@ -4,6 +4,7 @@ const HolographicBadge = ({ children, status = 'default', size = 'md', className
     warning: 'bg-[#F9A825]/10 text-[#F9A825] border-[#F9A825]/30 dark:bg-yellow-500/20 dark:text-yellow-400 dark:border-yellow-500',
     danger: 'bg-[#D32F2F]/10 text-[#D32F2F] border-[#D32F2F]/30 dark:bg-red-500/20 dark:text-red-400 dark:border-red-500',
     info: 'bg-[#1976D2]/10 text-[#1976D2] border-[#1976D2]/30 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500',
+    purple: 'bg-[#8A2BE2]/10 text-[#8A2BE2] border-[#8A2BE2]/30 dark:bg-purple-500/20 dark:text-purple-400 dark:border-purple-500',
     default: 'bg-gray-200 text-gray-700 border-gray-300 dark:bg-gray-500/20 dark:text-gray-400 dark:border-gray-500'
   };
 

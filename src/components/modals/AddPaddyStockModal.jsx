@@ -16,7 +16,14 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, i
     customerName: '',
     customerId: '',
     mobileNumber: '',
-    status: 'In Stock'
+    status: 'In Stock',
+    note: '',
+    riceType: '',
+    riceQuantity: '',
+    brokenRiceType: '',
+    brokenRiceQuantity: '',
+    polishRiceType: '',
+    polishRiceQuantity: ''
   });
 
   const [updateComment, setUpdateComment] = useState('');
@@ -39,7 +46,14 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, i
         customerName: initialData.customerName || '',
         customerId: initialData.customerId || '',
         mobileNumber: initialData.mobileNumber || '',
-        status: initialData.status || 'In Stock'
+        status: initialData.status || 'In Stock',
+        note: initialData.note || '',
+        riceType: initialData.riceType || '',
+        riceQuantity: initialData.riceQuantity || '',
+        brokenRiceType: initialData.brokenRiceType || '',
+        brokenRiceQuantity: initialData.brokenRiceQuantity || '',
+        polishRiceType: initialData.polishRiceType || '',
+        polishRiceQuantity: initialData.polishRiceQuantity || ''
       });
     }
   }, [editMode, initialData]);
@@ -47,19 +61,85 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, i
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const stockData = {
-        ...formData,
-        totalValue: parseFloat(totalValue),
-        lastUpdated: new Date().toISOString()
-      };
-
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
       if (editMode && initialData) {
         if (updateComment.trim()) {
           console.log('Paddy stock updated. Comment:', updateComment);
         }
-        const response = await stockService.updatePaddyStock(initialData.id, stockData);
-        onStockAdded({ ...response.data, id: initialData.id });
+        
+        const transactionType = initialData.transactionType;
+        
+        if (transactionType === 'Add Stock') {
+          const stockData = {
+            paddyType: formData.paddyType,
+            quantity: parseInt(formData.quantity),
+            bags: parseInt(formData.bags) || 0,
+            moistureLevel: parseFloat(formData.moistureLevel),
+            pricePerKg: parseFloat(formData.pricePerKg),
+            customerName: formData.customerName,
+            customerId: formData.customerId,
+            mobileNumber: formData.mobileNumber,
+            warehouse: formData.warehouse,
+            status: 'U-addstock',
+            totalamount: parseFloat(totalValue),
+            date: initialData.date,
+            user: user.username || user.name || '',
+            note: updateComment.trim() || ''
+          };
+          await stockService.updatePaddyStock(initialData.id, stockData);
+        } else if (transactionType === 'Sale') {
+          const saleData = {
+            paddyType: formData.paddyType,
+            quantity: parseInt(formData.quantity),
+            bags: parseInt(formData.bags) || 0,
+            pricePerKg: parseFloat(formData.pricePerKg),
+            customerName: formData.customerName,
+            customerId: formData.customerId,
+            mobileNumber: formData.mobileNumber,
+            warehouse: formData.warehouse,
+            status: 'U-sale',
+            totalamount: parseFloat(totalValue),
+            date: initialData.date,
+            user: user.username || user.name || '',
+            note: updateComment.trim() || ''
+          };
+          await stockService.updatePaddySale(initialData.id, saleData);
+        } else if (transactionType === 'Threshing') {
+          const threshingData = {
+            paddyType: formData.paddyType,
+            PaddyQuantity: parseInt(formData.quantity),
+            riceType: formData.riceType || '',
+            riceQuantity: parseInt(formData.riceQuantity) || 0,
+            brokenRiceType: formData.brokenRiceType || '',
+            brokenRiceQuantity: parseInt(formData.brokenRiceQuantity) || 0,
+            polishRiceType: formData.polishRiceType || '',
+            polishRiceQuantity: parseInt(formData.polishRiceQuantity) || 0,
+            warehouse: formData.warehouse,
+            note: updateComment.trim() || formData.note || '',
+            status: 'U-threshing',
+            date: initialData.date,
+            user: user.username || user.name || ''
+          };
+          await stockService.updatePaddyThreshing(initialData.id, threshingData);
+        }
+        onStockAdded();
       } else {
+        const stockData = {
+          paddyType: formData.paddyType,
+          quantity: parseInt(formData.quantity),
+          bags: parseInt(formData.bags) || 0,
+          moistureLevel: parseFloat(formData.moistureLevel),
+          pricePerKg: parseFloat(formData.pricePerKg),
+          customerName: formData.customerName,
+          customerId: formData.customerId,
+          mobileNumber: formData.mobileNumber,
+          warehouse: formData.warehouse,
+          status: 'addstock',
+          totalamount: parseFloat(totalValue),
+          date: new Date().toISOString().split('T')[0],
+          user: user.username || user.name || ''
+        };
         const response = await stockService.addPaddyStock(stockData);
         onStockAdded(response.data);
       }
@@ -78,7 +158,8 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, i
           customerName: '',
           customerId: '',
           mobileNumber: '',
-          status: 'In Stock'
+          status: 'In Stock',
+          note: ''
         });
       }
     } catch (error) {
@@ -122,59 +203,65 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, i
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-          <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Supplier Name</label>
-            <input
-              type="text"
-              name="customerName"
-              value={formData.customerName}
-              onChange={handleChange}
-              className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
-              placeholder="Enter supplier name"
-            />
-          </div>
-          <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Supplier ID</label>
-            <input
-              type="text"
-              name="customerId"
-              value={formData.customerId}
-              onChange={handleChange}
-              className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
-              placeholder="Enter supplier ID"
-            />
-          </div>
-        </div>
+        {(!editMode || initialData?.transactionType !== 'Threshing') && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div>
+                <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Supplier Name</label>
+                <input
+                  type="text"
+                  name="customerName"
+                  value={formData.customerName}
+                  onChange={handleChange}
+                  className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
+                  placeholder="Enter supplier name"
+                />
+              </div>
+              <div>
+                <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Supplier ID</label>
+                <input
+                  type="text"
+                  name="customerId"
+                  value={formData.customerId}
+                  onChange={handleChange}
+                  className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
+                  placeholder="Enter supplier ID"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div>
+                <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mobile Number</label>
+                <input
+                  type="tel"
+                  name="mobileNumber"
+                  value={formData.mobileNumber}
+                  onChange={handleChange}
+                  className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
+                  placeholder="Enter mobile number"
+                />
+              </div>
+              <div>
+                <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bags</label>
+                <input
+                  type="number"
+                  name="bags"
+                  value={formData.bags}
+                  onChange={handleChange}
+                  className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+                  placeholder="Number of bags"
+                />
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mobile Number</label>
-            <input
-              type="tel"
-              name="mobileNumber"
-              value={formData.mobileNumber}
-              onChange={handleChange}
-              className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
-              placeholder="Enter mobile number"
-            />
-          </div>
-          <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bags</label>
-            <input
-              type="number"
-              name="bags"
-              value={formData.bags}
-              onChange={handleChange}
-              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
-              placeholder="Number of bags"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-          <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity (kg)</label>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {editMode && initialData?.transactionType === 'Threshing' ? 'Paddy Quantity (kg)' : 'Quantity (kg)'}
+            </label>
             <input
               type="number"
               name="quantity"
@@ -184,44 +271,123 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, i
               required
             />
           </div>
-          <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Moisture Level (%)</label>
-            <input
-              type="number"
-              step="0.1"
-              name="moistureLevel"
-              value={formData.moistureLevel}
-              onChange={handleChange}
-              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
-              required
-            />
-          </div>
+          {(!editMode || initialData?.transactionType === 'Add Stock') && (
+            <div>
+              <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Moisture Level (%)</label>
+              <input
+                type="number"
+                step="0.1"
+                name="moistureLevel"
+                value={formData.moistureLevel}
+                onChange={handleChange}
+                className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+                required
+              />
+            </div>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+        {editMode && initialData?.transactionType === 'Threshing' && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div>
+                <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rice Type</label>
+                <input
+                  type="text"
+                  name="riceType"
+                  value={formData.riceType}
+                  onChange={handleChange}
+                  className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rice Quantity (kg)</label>
+                <input
+                  type="number"
+                  name="riceQuantity"
+                  value={formData.riceQuantity}
+                  onChange={handleChange}
+                  className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div>
+                <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Broken Rice Type</label>
+                <input
+                  type="text"
+                  name="brokenRiceType"
+                  value={formData.brokenRiceType}
+                  onChange={handleChange}
+                  className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Broken Rice Quantity (kg)</label>
+                <input
+                  type="number"
+                  name="brokenRiceQuantity"
+                  value={formData.brokenRiceQuantity}
+                  onChange={handleChange}
+                  className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div>
+                <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Polish Rice Type</label>
+                <input
+                  type="text"
+                  name="polishRiceType"
+                  value={formData.polishRiceType}
+                  onChange={handleChange}
+                  className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Polish Rice Quantity (kg)</label>
+                <input
+                  type="number"
+                  name="polishRiceQuantity"
+                  value={formData.polishRiceQuantity}
+                  onChange={handleChange}
+                  className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+          </>
+        )}
+
+        {(!editMode || initialData?.transactionType !== 'Threshing') && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            <div>
+              <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price per kg</label>
+              <input
+                type="number"
+                step="0.01"
+                name="pricePerKg"
+                value={formData.pricePerKg}
+                onChange={handleChange}
+                className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
+                required
+              />
+            </div>
+          </div>
+        )}
+
+        {(!editMode || initialData?.transactionType !== 'Threshing') && (
           <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price per kg</label>
+            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Total Value (Bill)</label>
             <input
-              type="number"
-              step="0.01"
-              name="pricePerKg"
-              value={formData.pricePerKg}
-              onChange={handleChange}
-              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
-              required
+              type="text"
+              value={`Rs. ${totalValue}`}
+              disabled
+              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white font-semibold cursor-not-allowed"
             />
           </div>
-        </div>
-
-        <div>
-          <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Total Value (Bill)</label>
-          <input
-            type="text"
-            value={`Rs. ${totalValue}`}
-            disabled
-            className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white font-semibold cursor-not-allowed"
-          />
-        </div>
+        )}
 
         {editMode && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
