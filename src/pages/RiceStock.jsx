@@ -70,7 +70,7 @@ const RiceStock = () => {
   };
 
   const handleStockAdded = (newStock) => {
-    setStocks(prev => [...prev, newStock]);
+    loadStocks();
   };
 
   const handleExport = async (options) => {
@@ -214,7 +214,11 @@ const RiceStock = () => {
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[15%]">{stock.customerName || '-'}</td>
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[13%]">{stock.mobileNumber || '-'}</td>
                         <td className="py-3 md:py-4 px-2 md:px-4 w-[12%]">
-                          <HolographicBadge status={stock.transactionType === 'Sale' ? 'info' : getStatusBadge(stock.status)} size="xs" className="!px-2 !py-1 !text-xs">
+                          <HolographicBadge 
+                            status={(stock.status === 'U-addstock' || stock.status === 'U-sale') ? 'warning' : (stock.transactionType === 'Sale' ? 'info' : 'success')} 
+                            size="xs" 
+                            className="!px-2 !py-1 !text-xs"
+                          >
                             {stock.transactionType || 'Add Stock'}
                           </HolographicBadge>
                         </td>
