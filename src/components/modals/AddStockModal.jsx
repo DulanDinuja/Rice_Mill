@@ -43,6 +43,7 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, initia
     e.preventDefault();
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const isSale = editMode && initialData?.transactionType === 'Sale';
       const stockData = {
         riceType: formData.riceType,
         quantity: parseInt(formData.quantity),
@@ -51,7 +52,7 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, initia
         customerId: formData.customerId,
         mobileNumber: formData.mobileNumber,
         bags: parseInt(formData.bags) || 0,
-        status: formData.status,
+        status: isSale ? 'U-sale' : 'In Stock',
         totalamount: parseFloat(totalValue),
         date: new Date().toISOString().split('T')[0],
         user: user.username || user.name || '',
@@ -59,9 +60,6 @@ const AddStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, initia
       };
 
       if (editMode && initialData) {
-        // Check if it's a Sale transaction or Add Stock transaction
-        const isSale = initialData.transactionType === 'Sale';
-        
         if (isSale) {
           // Call sale update API
           const response = await stockService.updateRiceSale(initialData.id, stockData);

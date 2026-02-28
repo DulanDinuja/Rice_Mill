@@ -92,6 +92,7 @@ const RiceStock = () => {
         customerId: saleData.customerId,
         mobileNumber: saleData.customerPhone,
         bags: parseInt(saleData.bags) || 0,
+        status: 'sale',
         totalamount: parseFloat(saleData.totalAmount),
         date: saleData.saleDate,
         user: user.username || user.name || ''
