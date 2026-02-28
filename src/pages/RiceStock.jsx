@@ -123,9 +123,9 @@ const RiceStock = () => {
       try {
         const isSale = stockToDelete.transactionType === 'Sale';
         if (isSale) {
-          await stockService.deleteRiceSale(stockToDelete.id);
+          await stockService.deleteRiceSale(stockToDelete.id, reason);
         } else {
-          await stockService.deleteRiceStock(stockToDelete.id);
+          await stockService.deleteRiceStock(stockToDelete.id, reason);
         }
         loadStocks();
         console.log('Stock deleted. Reason:', reason);

@@ -51,18 +51,18 @@ export const stockService = {
     return axiosInstance.put(`/rice/addstock/${id}`, data);
   },
 
-  deleteRiceStock: async (id) => {
+  deleteRiceStock: async (id, deleteReason) => {
     if (USE_MOCK) {
       return { data: { success: true } };
     }
-    return axiosInstance.delete(`/rice/addstock/${id}`);
+    return axiosInstance.delete(`/rice/addstock/${id}`, { data: { deleteReason } });
   },
 
-  deleteRiceSale: async (id) => {
+  deleteRiceSale: async (id, deleteReason) => {
     if (USE_MOCK) {
       return { data: { success: true } };
     }
-    return axiosInstance.delete(`/rice/ricesale/${id}`);
+    return axiosInstance.delete(`/rice/ricesale/${id}`, { data: { deleteReason } });
   },
 
   addRiceStock: async (stockData) => {
