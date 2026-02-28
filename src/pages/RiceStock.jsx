@@ -121,9 +121,14 @@ const RiceStock = () => {
   const confirmDelete = async (reason) => {
     if (stockToDelete) {
       try {
-        await stockService.deleteRiceStock(stockToDelete.id);
-        setStocks(prev => prev.filter(stock => stock.id !== stockToDelete.id));
-        console.log('Stock deleted. Reason:', reason); // Log the reason
+        const isSale = stockToDelete.transactionType === 'Sale';
+        if (isSale) {
+          await stockService.deleteRiceSale(stockToDelete.id);
+        } else {
+          await stockService.deleteRiceStock(stockToDelete.id);
+        }
+        loadStocks();
+        console.log('Stock deleted. Reason:', reason);
         setIsDeleteModalOpen(false);
         setStockToDelete(null);
       } catch (error) {

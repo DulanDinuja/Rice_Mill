@@ -55,7 +55,14 @@ export const stockService = {
     if (USE_MOCK) {
       return { data: { success: true } };
     }
-    return axiosInstance.delete(`/rice-stocks/${id}`);
+    return axiosInstance.delete(`/rice/addstock/${id}`);
+  },
+
+  deleteRiceSale: async (id) => {
+    if (USE_MOCK) {
+      return { data: { success: true } };
+    }
+    return axiosInstance.delete(`/rice/ricesale/${id}`);
   },
 
   addRiceStock: async (stockData) => {
