@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Download, ShoppingCart, Wheat, Edit, Trash2, Search } from 'lucide-react';
+import { Plus, Download, ShoppingCart, Wheat, Edit, Trash2, Search, ArrowUp, ArrowDown } from 'lucide-react';
 import GlassCard from '../components/ui/GlassCard';
 import NeonButton from '../components/ui/NeonButton';
 import HolographicBadge from '../components/ui/HolographicBadge';
@@ -16,6 +16,7 @@ import { formatCurrency, formatDate } from '../utils/formatters';
 const PaddyStock = () => {
   const [stocks, setStocks] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('desc');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isSaleModalOpen, setIsSaleModalOpen] = useState(false);
@@ -51,6 +52,10 @@ const PaddyStock = () => {
       formatDate(stock.lastUpdated)?.toLowerCase().includes(search) ||
       stock.bags?.toString().includes(search)
     );
+  }).sort((a, b) => {
+    const dateA = new Date(a.lastUpdated);
+    const dateB = new Date(b.lastUpdated);
+    return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
   });
 
   const handleStockAdded = (newStock) => {
@@ -201,7 +206,12 @@ const PaddyStock = () => {
                     <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Supplier Name</th>
                     <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Contact</th>
                     <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[10%]">Status</th>
-                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Last Updated</th>
+                    <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">
+                      <button onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')} className="flex items-center gap-1 hover:opacity-70 transition-opacity">
+                        Last Updated
+                        {sortOrder === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+                      </button>
+                    </th>
                     <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Actions</th>
                   </tr>
                 </thead>
@@ -216,7 +226,12 @@ const PaddyStock = () => {
                       <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Supplier Name</th>
                       <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Contact</th>
                       <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[10%]">Status</th>
-                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">Last Updated</th>
+                      <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[12%]">
+                        <button onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')} className="flex items-center gap-1 hover:opacity-70 transition-opacity">
+                          Last Updated
+                          {sortOrder === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+                        </button>
+                      </th>
                       <th className="text-left py-2 md:py-3 px-2 md:px-4 text-[#66BB6A] dark:text-secondary-400 font-medium text-xs md:text-sm whitespace-nowrap w-[15%]">Actions</th>
                     </tr>
                   </thead>
