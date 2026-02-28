@@ -236,7 +236,7 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
         <div className="bg-[#2E7D32]/10 border border-[#2E7D32]/20 dark:bg-primary-500/10 dark:border-primary-500/20 rounded-lg p-3 md:p-4">
           <div className="flex justify-between items-center">
             <span className="text-[#2E7D32] dark:text-primary-400 font-medium text-sm md:text-base">Total Amount:</span>
-            <span className="text-gray-900 dark:text-white text-lg md:text-xl font-bold">
+            <span className="text-[#2E7D32] dark:text-primary-400 text-lg md:text-xl font-bold">
               Rs. {formData.totalAmount.toFixed(2)}
             </span>
           </div>

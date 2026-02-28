@@ -378,14 +378,13 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, i
         )}
 
         {(!editMode || initialData?.transactionType !== 'Threshing') && (
-          <div>
-            <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Total Value (Bill)</label>
-            <input
-              type="text"
-              value={`Rs. ${totalValue}`}
-              disabled
-              className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white font-semibold cursor-not-allowed"
-            />
+          <div className="bg-[#2E7D32]/10 border border-[#2E7D32]/20 dark:bg-primary-500/10 dark:border-primary-500/20 rounded-lg p-3 md:p-4">
+            <div className="flex justify-between items-center">
+              <span className="text-[#2E7D32] dark:text-primary-400 font-medium text-sm md:text-base">Total Value (Bill):</span>
+              <span className="text-[#2E7D32] dark:text-primary-400 text-lg md:text-xl font-bold">
+                Rs. {totalValue}
+              </span>
+            </div>
           </div>
         )}
 
