@@ -260,13 +260,16 @@ const RiceStock = () => {
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[13%]">{formatDate(stock.lastUpdated)}</td>
                         <td className="py-3 md:py-4 px-2 md:px-4 w-[10%]">
                           <div className="flex gap-2">
-                            <button
-                              onClick={() => handleEdit(stock)}
-                              className="p-1.5 md:p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 transition-colors"
-                              title="Edit"
-                            >
-                              <Edit size={16} />
-                            </button>
+                            {/* Hide Edit button for Threshing records (purple status) */}
+                            {stock.transactionType !== 'Threshing' && (
+                              <button
+                                onClick={() => handleEdit(stock)}
+                                className="p-1.5 md:p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 transition-colors"
+                                title="Edit"
+                              >
+                                <Edit size={16} />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleDelete(stock)}
                               className="p-1.5 md:p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 transition-colors"
