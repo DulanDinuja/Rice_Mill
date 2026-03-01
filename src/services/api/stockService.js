@@ -14,27 +14,32 @@ export const stockService = {
       }
       return { data: stocks };
     }
-    const [addStockRes, saleStockRes, threshingRes] = await Promise.all([
+    // Only fetch addstock and sales - threshing rice is already added to addstock by backend
+    const [addStockRes, saleStockRes] = await Promise.all([
       axiosInstance.get('/rice/addstock'),
-      axiosInstance.get('/rice/ricesale'),
-      axiosInstance.get('/paddy/paddythreshing')
+      axiosInstance.get('/rice/ricesale')
     ]);
-    const addStocks = (addStockRes.data || []).map(item => ({ ...item, transactionType: 'Add Stock', lastUpdated: item.date, uniqueId: `addstock-${item.id}` }));
-    const saleStocks = (saleStockRes.data || []).map(item => ({ ...item, transactionType: 'Sale', lastUpdated: item.date, uniqueId: `sale-${item.id}` }));
-    const threshingStocks = (threshingRes.data || []).flatMap(item => {
-      const stocks = [];
-      if (item.riceType && item.riceQuantity) {
-        stocks.push({ riceType: item.riceType, quantity: item.riceQuantity, transactionType: 'Threshing', lastUpdated: item.date, uniqueId: `threshing-${item.id}-rice`, id: item.id });
-      }
-      if (item.brokenRiceType && item.brokenRiceQuantity) {
-        stocks.push({ riceType: item.brokenRiceType, quantity: item.brokenRiceQuantity, transactionType: 'Threshing', lastUpdated: item.date, uniqueId: `threshing-${item.id}-broken`, id: item.id });
-      }
-      if (item.polishRiceType && item.polishRiceQuantity) {
-        stocks.push({ riceType: item.polishRiceType, quantity: item.polishRiceQuantity, transactionType: 'Threshing', lastUpdated: item.date, uniqueId: `threshing-${item.id}-polish`, id: item.id });
-      }
-      return stocks;
+
+    const addStocks = (addStockRes.data || []).map(item => {
+      // Check if this is a threshing entry
+      const isThreshing = item.customerName === 'Threshing' ||
+                          (item.customerName || '').toLowerCase().includes('threshing');
+      return {
+        ...item,
+        transactionType: isThreshing ? 'Threshing' : 'Add Stock',
+        lastUpdated: item.date,
+        uniqueId: `addstock-${item.id}`
+      };
     });
-    return { data: [...addStocks, ...saleStocks, ...threshingStocks] };
+
+    const saleStocks = (saleStockRes.data || []).map(item => ({
+      ...item,
+      transactionType: 'Sale',
+      lastUpdated: item.date,
+      uniqueId: `sale-${item.id}`
+    }));
+
+    return { data: [...addStocks, ...saleStocks] };
   },
 
   getPaddyStocks: async () => {
