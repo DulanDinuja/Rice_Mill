@@ -149,9 +149,9 @@ const ReportFilters = ({
                      focus:border-green-500 dark:focus:border-primary-500
                      transition-all duration-200"
           >
-            {reportTypeOptions.map((option) => (
+            {reportTypeOptions.map((option, index) => (
               <option
-                key={option.value}
+                key={`report-type-${index}`}
                 value={option.value}
                 disabled={option.disabled}
                 className="bg-white dark:bg-gray-800"
@@ -177,8 +177,8 @@ const ReportFilters = ({
                      transition-all duration-200"
           >
             <option value="" className="bg-white dark:bg-gray-800">All Warehouses</option>
-            {warehouses.map((warehouse) => (
-              <option key={warehouse} value={warehouse} className="bg-white dark:bg-gray-800">
+            {Array.isArray(warehouses) && warehouses.map((warehouse, index) => (
+              <option key={`warehouse-${index}`} value={warehouse} className="bg-white dark:bg-gray-800">
                 {warehouse}
               </option>
             ))}
@@ -201,8 +201,8 @@ const ReportFilters = ({
                        transition-all duration-200"
             >
               <option value="" className="bg-white dark:bg-gray-800">All Paddy Types</option>
-              {PADDY_TYPES.map((type) => (
-                <option key={type} value={type} className="bg-white dark:bg-gray-800">
+              {PADDY_TYPES.map((type, index) => (
+                <option key={`paddy-${index}`} value={type} className="bg-white dark:bg-gray-800">
                   {type}
                 </option>
               ))}
@@ -226,8 +226,8 @@ const ReportFilters = ({
                        transition-all duration-200"
             >
               <option value="" className="bg-white dark:bg-gray-800">All Rice Types</option>
-              {RICE_TYPES.map((type) => (
-                <option key={type} value={type} className="bg-white dark:bg-gray-800">
+              {RICE_TYPES.map((type, index) => (
+                <option key={`rice-${index}`} value={type} className="bg-white dark:bg-gray-800">
                   {type}
                 </option>
               ))}
@@ -257,8 +257,8 @@ const ReportFilters = ({
                   ? 'All Customers'
                   : 'All Suppliers'}
               </option>
-              {suppliers.map((supplier) => (
-                <option key={supplier} value={supplier} className="bg-white dark:bg-gray-800">
+              {Array.isArray(suppliers) && suppliers.map((supplier, index) => (
+                <option key={`supplier-${index}`} value={supplier} className="bg-white dark:bg-gray-800">
                   {supplier}
                 </option>
               ))}

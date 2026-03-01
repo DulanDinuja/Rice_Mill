@@ -26,8 +26,21 @@ const Reports = () => {
 
   // Initialize warehouses and suppliers
   useEffect(() => {
-    setWarehouses(reportsService.getWarehouses());
-    setSuppliers(reportsService.getSuppliers());
+    const loadFilters = async () => {
+      try {
+        const [warehousesRes, suppliersRes] = await Promise.all([
+          reportsService.getWarehouses(),
+          reportsService.getSuppliers()
+        ]);
+        setWarehouses(warehousesRes.data || []);
+        setSuppliers(suppliersRes.data || []);
+      } catch (error) {
+        console.error('Error loading filters:', error);
+        setWarehouses([]);
+        setSuppliers([]);
+      }
+    };
+    loadFilters();
   }, []);
 
   const handleGenerateReport = async () => {
