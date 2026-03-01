@@ -11,6 +11,14 @@ export const REPORT_TYPES = {
 };
 
 export const reportsService = {
+  // Get all system data for reports dashboard
+  getAllSystemData: async () => {
+    if (USE_MOCK) {
+      return { data: {} };
+    }
+    return axiosInstance.get('/reports/all-system-data');
+  },
+
   generateReport: async (reportRequest) => {
     if (USE_MOCK) {
       return { data: [] };
