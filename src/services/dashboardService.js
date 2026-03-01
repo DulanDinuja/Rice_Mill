@@ -43,5 +43,12 @@ export const dashboardService = {
       return { data: [] };
     }
     return axiosInstance.get('/dashboard/low-stock-alerts');
+  },
+
+  getBrokenAndPolishRiceQuantity: async () => {
+    if (USE_MOCK) {
+      return { data: { brokenRiceQuantity: 0, polishRiceQuantity: 0 } };
+    }
+    return axiosInstance.get('/dashboard/broken-polish-rice');
   }
 };

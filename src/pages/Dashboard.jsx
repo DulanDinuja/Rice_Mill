@@ -7,6 +7,7 @@ import { dashboardService } from '../services/dashboardService';
 const Dashboard = () => {
   const [stats, setStats] = useState({
     riceStock: { totalStock: 0, percentageChange: 0, isIncrease: true },
+    brokenPolishRice: { brokenRiceQuantity: 0, polishRiceQuantity: 0 },
     paddyStock: { totalStock: 0, percentageChange: 0, isIncrease: true },
     revenue: { totalRevenue: 0, percentageChange: 0, isIncrease: true },
     warehouses: { totalWarehouses: 0 }
@@ -21,8 +22,9 @@ const Dashboard = () => {
 
   const loadDashboardData = async () => {
     try {
-      const [riceRes, paddyRes, revenueRes, warehousesRes, activitiesRes, alertsRes] = await Promise.all([
+      const [riceRes, brokenPolishRes, paddyRes, revenueRes, warehousesRes, activitiesRes, alertsRes] = await Promise.all([
         dashboardService.getTotalRiceStock(),
+        dashboardService.getBrokenAndPolishRiceQuantity(),
         dashboardService.getTotalPaddyStock(),
         dashboardService.getTotalRevenue(),
         dashboardService.getTotalWarehouses(),
@@ -32,6 +34,7 @@ const Dashboard = () => {
 
       setStats({
         riceStock: riceRes.data,
+        brokenPolishRice: brokenPolishRes.data,
         paddyStock: paddyRes.data,
         revenue: revenueRes.data,
         warehouses: warehousesRes.data
@@ -84,7 +87,7 @@ const Dashboard = () => {
         <p className="text-sm md:text-base text-[#546E7A] dark:text-gray-400">Welcome back! Here's your inventory overview.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
         <StatsCard
           title="Total Rice Stock"
           value={`${stats.riceStock.totalStock.toLocaleString()} kg`}
@@ -92,6 +95,18 @@ const Dashboard = () => {
           trend={stats.riceStock.percentageChange}
           color="primary"
         />
+        <GlassCard className="p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 rounded-lg bg-[#2E7D32]/10 dark:bg-primary-500/20">
+              <Package className="text-[#2E7D32] dark:text-primary-400" size={24} />
+            </div>
+            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Broken & Polish Rice</h3>
+          </div>
+          <div className="space-y-2">
+            <p className="text-base text-gray-700 dark:text-gray-300">Broken Rice: <span className="text-xl font-bold">{stats.brokenPolishRice.brokenRiceQuantity.toLocaleString()} kg</span></p>
+            <p className="text-base text-gray-700 dark:text-gray-300">Polish Rice: <span className="text-xl font-bold">{stats.brokenPolishRice.polishRiceQuantity.toLocaleString()} kg</span></p>
+          </div>
+        </GlassCard>
         <StatsCard
           title="Total Paddy Stock"
           value={`${stats.paddyStock.totalStock.toLocaleString()} kg`}

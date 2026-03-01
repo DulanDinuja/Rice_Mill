@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import GlassCard from '../components/ui/GlassCard';
 import ReportFilters from '../components/reports/ReportFilters';
 import ReportTable from '../components/reports/ReportTable';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts';
 import { reportsService } from '../services/reportsService';
 import { Download, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -20,6 +20,7 @@ const Reports = () => {
 
   const [reportData, setReportData] = useState([]);
   const [chartData, setChartData] = useState([]);
+  const [systemData, setSystemData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [warehouses, setWarehouses] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
@@ -28,12 +29,14 @@ const Reports = () => {
   useEffect(() => {
     const loadFilters = async () => {
       try {
-        const [warehousesRes, suppliersRes] = await Promise.all([
+        const [warehousesRes, suppliersRes, systemDataRes] = await Promise.all([
           reportsService.getWarehouses(),
-          reportsService.getSuppliers()
+          reportsService.getSuppliers(),
+          reportsService.getAllSystemData()
         ]);
         setWarehouses(warehousesRes.data || []);
         setSuppliers(suppliersRes.data || []);
+        setSystemData(systemDataRes.data);
       } catch (error) {
         console.error('Error loading filters:', error);
         setWarehouses([]);
@@ -173,6 +176,54 @@ const Reports = () => {
           Generate detailed reports with custom filters
         </p>
       </div>
+
+      {/* System Overview Charts */}
+      {systemData && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+          <GlassCard>
+            <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4">Stock Overview</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={[
+                { name: 'Paddy Stock', value: systemData.summary?.totalPaddyStock || 0 },
+                { name: 'Rice Stock', value: systemData.summary?.totalRiceStock || 0 },
+                { name: 'Broken Rice', value: systemData.summary?.totalBrokenRice || 0 },
+                { name: 'Polish Rice', value: systemData.summary?.totalPolishRice || 0 }
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(46, 125, 50, 0.2)" />
+                <XAxis dataKey="name" stroke="#2E7D32" />
+                <YAxis stroke="#2E7D32" />
+                <Tooltip />
+                <Bar dataKey="value" fill="#2E7D32" name="Quantity (kg)" />
+              </BarChart>
+            </ResponsiveContainer>
+          </GlassCard>
+
+          <GlassCard>
+            <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4">Revenue Distribution</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={[
+                    { name: 'Paddy Sales', value: systemData.summary?.totalPaddySales || 0 },
+                    { name: 'Rice Sales', value: systemData.summary?.totalRiceSales || 0 }
+                  ]}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  <Cell fill="#2E7D32" />
+                  <Cell fill="#66BB6A" />
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </GlassCard>
+        </div>
+      )}
 
       {/* Filters Section */}
       <ReportFilters
