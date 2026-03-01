@@ -141,6 +141,7 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
               name="customerId"
               value={formData.customerId}
               onChange={handleInputChange}
+              required
               className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
               placeholder="Enter customer ID"
             />
@@ -157,6 +158,7 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
               name="customerPhone"
               value={formData.customerPhone}
               onChange={handleInputChange}
+              required
               className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
               placeholder="Enter phone number"
             />
@@ -170,6 +172,7 @@ const SaleModal = ({ isOpen, onClose, title, stockData, onSaleComplete }) => {
               name="bags"
               value={formData.bags}
               onChange={handleInputChange}
+              required
               min="0"
               step="1"
               className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"

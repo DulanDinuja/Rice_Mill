@@ -128,8 +128,8 @@ const Dashboard = () => {
                 <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-[#F8FAF9] to-[#FAFBFA] dark:from-white/[0.08] dark:to-white/[0.12] dark:bg-gradient-to-br border border-[#E8F5E9] dark:border-white/30 shadow-sm dark:shadow-lg dark:shadow-black/20 backdrop-blur-sm">
                   <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#2E7D32] to-[#388E3C] dark:from-primary-400 dark:to-primary-500 shadow-sm shadow-[#2E7D32]/30 dark:shadow-primary-500/60 dark:animate-pulse" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-[#263238] dark:text-gray-100">{activity.description}</p>
-                    <p className="text-xs text-[#78909C] dark:text-gray-400">{activity.type} - {activity.timestamp}</p>
+                    <p className="text-sm font-medium text-[#263238] dark:text-gray-100">{activity.type}: {activity.description}</p>
+                    <p className="text-xs text-[#78909C] dark:text-gray-400">{activity.timestamp}</p>
                   </div>
                 </div>
               ))

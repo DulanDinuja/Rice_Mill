@@ -14,13 +14,27 @@ export const stockService = {
       }
       return { data: stocks };
     }
-    const [addStockRes, saleStockRes] = await Promise.all([
+    const [addStockRes, saleStockRes, threshingRes] = await Promise.all([
       axiosInstance.get('/rice/addstock'),
-      axiosInstance.get('/rice/ricesale')
+      axiosInstance.get('/rice/ricesale'),
+      axiosInstance.get('/paddy/paddythreshing')
     ]);
     const addStocks = (addStockRes.data || []).map(item => ({ ...item, transactionType: 'Add Stock', lastUpdated: item.date, uniqueId: `addstock-${item.id}` }));
     const saleStocks = (saleStockRes.data || []).map(item => ({ ...item, transactionType: 'Sale', lastUpdated: item.date, uniqueId: `sale-${item.id}` }));
-    return { data: [...addStocks, ...saleStocks] };
+    const threshingStocks = (threshingRes.data || []).flatMap(item => {
+      const stocks = [];
+      if (item.riceType && item.riceQuantity) {
+        stocks.push({ riceType: item.riceType, quantity: item.riceQuantity, transactionType: 'Threshing', lastUpdated: item.date, uniqueId: `threshing-${item.id}-rice`, id: item.id });
+      }
+      if (item.brokenRiceType && item.brokenRiceQuantity) {
+        stocks.push({ riceType: item.brokenRiceType, quantity: item.brokenRiceQuantity, transactionType: 'Threshing', lastUpdated: item.date, uniqueId: `threshing-${item.id}-broken`, id: item.id });
+      }
+      if (item.polishRiceType && item.polishRiceQuantity) {
+        stocks.push({ riceType: item.polishRiceType, quantity: item.polishRiceQuantity, transactionType: 'Threshing', lastUpdated: item.date, uniqueId: `threshing-${item.id}-polish`, id: item.id });
+      }
+      return stocks;
+    });
+    return { data: [...addStocks, ...saleStocks, ...threshingStocks] };
   },
 
   getPaddyStocks: async () => {

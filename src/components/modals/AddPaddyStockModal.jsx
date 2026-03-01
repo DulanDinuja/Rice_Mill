@@ -215,6 +215,7 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, i
                   onChange={handleChange}
                   className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
                   placeholder="Enter supplier name"
+                  required
                 />
               </div>
               <div>
@@ -226,6 +227,7 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, i
                   onChange={handleChange}
                   className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
                   placeholder="Enter supplier ID"
+                  required
                 />
               </div>
             </div>
@@ -240,6 +242,7 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, i
                   onChange={handleChange}
                   className="w-full glass-input rounded-lg px-3 py-2 bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
                   placeholder="Enter mobile number"
+                  required
                 />
               </div>
               <div>
@@ -251,6 +254,7 @@ const AddPaddyStockModal = ({ isOpen, onClose, onStockAdded, editMode = false, i
                   onChange={handleChange}
                   className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
                   placeholder="Number of bags"
+                  required
                 />
               </div>
             </div>

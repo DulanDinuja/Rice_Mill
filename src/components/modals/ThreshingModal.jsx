@@ -158,6 +158,7 @@ const ThreshingModal = ({ isOpen, onClose, onThreshingComplete }) => {
               name="brokenRiceType"
               value={formData.brokenRiceType}
               onChange={handleInputChange}
+              required
               className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
             >
               <option value="" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Select broken rice type...</option>
@@ -175,6 +176,7 @@ const ThreshingModal = ({ isOpen, onClose, onThreshingComplete }) => {
               name="brokenRiceQuantity"
               value={formData.brokenRiceQuantity}
               onChange={handleInputChange}
+              required
               min="0"
               step="0.01"
               className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"
@@ -193,6 +195,7 @@ const ThreshingModal = ({ isOpen, onClose, onThreshingComplete }) => {
               name="polishRiceType"
               value={formData.polishRiceType}
               onChange={handleInputChange}
+              required
               className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white"
             >
               <option value="" className="bg-white dark:bg-[#1A1A2E] text-gray-900 dark:text-white">Select polish rice type...</option>
@@ -210,6 +213,7 @@ const ThreshingModal = ({ isOpen, onClose, onThreshingComplete }) => {
               name="polishRiceQuantity"
               value={formData.polishRiceQuantity}
               onChange={handleInputChange}
+              required
               min="0"
               step="0.01"
               className="w-full glass-input rounded-lg px-3 py-2 text-sm bg-white dark:bg-white/[0.06] border border-gray-300 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/50"

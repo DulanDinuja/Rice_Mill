@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Download, ShoppingCart, Edit, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Search, Download, ShoppingCart, Edit, Trash2, ArrowUp, ArrowDown, Wheat } from 'lucide-react';
 import GlassCard from '../components/ui/GlassCard';
 import NeonButton from '../components/ui/NeonButton';
 import HolographicBadge from '../components/ui/HolographicBadge';
@@ -126,9 +126,11 @@ const RiceStock = () => {
   const confirmDelete = async (reason) => {
     if (stockToDelete) {
       try {
-        const isSale = stockToDelete.transactionType === 'Sale';
-        if (isSale) {
+        const transactionType = stockToDelete.transactionType;
+        if (transactionType === 'Sale') {
           await stockService.deleteRiceSale(stockToDelete.id, reason);
+        } else if (transactionType === 'Threshing') {
+          await stockService.deletePaddyThreshing(stockToDelete.id, reason);
         } else {
           await stockService.deleteRiceStock(stockToDelete.id, reason);
         }
@@ -225,16 +227,34 @@ const RiceStock = () => {
                       <tr key={stock.uniqueId || stock.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white font-medium text-xs md:text-sm whitespace-nowrap w-[13%]">{stock.riceType}</td>
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap w-[12%]">{stock.quantity} kg</td>
-                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap w-[12%]">{formatCurrency(stock.pricePerKg)}</td>
-                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[15%]">{stock.customerName || '-'}</td>
-                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[13%]">{stock.mobileNumber || '-'}</td>
+                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-900 dark:text-white text-xs md:text-sm whitespace-nowrap w-[12%]">
+                          {stock.transactionType === 'Threshing' ? (
+                            <Wheat size={16} className="text-[#66BB6A]" />
+                          ) : (
+                            formatCurrency(stock.pricePerKg)
+                          )}
+                        </td>
+                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[15%]">
+                          {stock.transactionType === 'Threshing' ? (
+                            <Wheat size={16} className="text-[#66BB6A]" />
+                          ) : (
+                            stock.customerName || '-'
+                          )}
+                        </td>
+                        <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[13%]">
+                          {stock.transactionType === 'Threshing' ? (
+                            <Wheat size={16} className="text-[#66BB6A]" />
+                          ) : (
+                            stock.mobileNumber || '-'
+                          )}
+                        </td>
                         <td className="py-3 md:py-4 px-2 md:px-4 w-[12%]">
                           <HolographicBadge 
-                            status={(stock.status === 'U-addstock' || stock.status === 'U-sale') ? 'warning' : (stock.transactionType === 'Sale' ? 'info' : 'success')} 
+                            status={(stock.status === 'U-addstock' || stock.status === 'U-sale' || stock.status === 'U-threshing') ? 'warning' : (stock.transactionType === 'Threshing' ? 'purple' : (stock.transactionType === 'Sale' ? 'info' : 'success'))} 
                             size="xs" 
                             className="!px-2 !py-1 !text-xs"
                           >
-                            {stock.transactionType || 'Add Stock'}
+                            {stock.transactionType === 'Threshing' ? 'Add Stock' : (stock.transactionType || 'Add Stock')}
                           </HolographicBadge>
                         </td>
                         <td className="py-3 md:py-4 px-2 md:px-4 text-gray-600 dark:text-gray-400 text-xs md:text-sm whitespace-nowrap w-[13%]">{formatDate(stock.lastUpdated)}</td>
