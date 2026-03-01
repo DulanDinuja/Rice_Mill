@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Package, Droplets, Warehouse, User, Calendar, Tag } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Package, Droplets, Warehouse, User, Calendar, Tag, Wheat, Box, Scale } from 'lucide-react';
 import { useState } from 'react';
 import { formatDate, formatNumber, formatPercentage, formatCurrency } from '../../utils/formatters';
 
@@ -13,43 +13,120 @@ const ReportTable = ({ data = [], reportType, loading = false }) => {
   const endIndex = startIndex + itemsPerPage;
   const currentData = data.slice(startIndex, endIndex);
 
-  // Determine columns based on report type
-  const isPaddyReport = reportType?.includes('paddy');
-  const isRiceReport = reportType?.includes('rice');
+  // Determine report type (handle both uppercase and lowercase)
+  const normalizedReportType = reportType?.toUpperCase() || '';
+  const isPaddyThreshing = normalizedReportType.includes('PADDY_THRESHING');
+  const isPaddySale = normalizedReportType.includes('PADDY_SALE');
+  const isPaddyStock = normalizedReportType.includes('PADDY_STOCK');
+  const isPaddyReport = normalizedReportType.includes('PADDY');
+  const isRiceSale = normalizedReportType.includes('RICE_SALE');
+  const isRiceStock = normalizedReportType.includes('RICE_STOCK');
+  const isRiceReport = normalizedReportType.includes('RICE');
 
-  const paddyColumns = [
-    { key: 'paddyType', label: 'Paddy Type', icon: Package },
-    { key: 'quantity', label: 'Quantity', icon: Package },
+  // Columns for Paddy Threshing Report (most comprehensive)
+  const paddyThreshingColumns = [
+    { key: 'paddyType', label: 'Paddy Type', icon: Wheat },
+    { key: 'paddyQuantity', label: 'Paddy Qty (kg)', icon: Scale },
+    { key: 'riceType', label: 'Rice Type', icon: Package },
+    { key: 'riceQuantity', label: 'Rice Qty (kg)', icon: Scale },
+    { key: 'brokenRiceType', label: 'Broken Rice Type', icon: Box },
+    { key: 'brokenRiceQuantity', label: 'Broken Qty (kg)', icon: Scale },
+    { key: 'polishRiceType', label: 'Polish Rice Type', icon: Box },
+    { key: 'polishRiceQuantity', label: 'Polish Qty (kg)', icon: Scale },
+    { key: 'warehouse', label: 'Warehouse', icon: Warehouse },
+    { key: 'user', label: 'User', icon: User },
+    { key: 'date', label: 'Date', icon: Calendar }
+  ];
+
+  // Columns for Paddy Sale Report
+  const paddySaleColumns = [
+    { key: 'paddyType', label: 'Paddy Type', icon: Wheat },
+    { key: 'quantity', label: 'Quantity (kg)', icon: Scale, fallback: 'paddyQuantity' },
+    { key: 'pricePerKg', label: 'Price/kg', icon: Tag },
+    { key: 'totalAmount', label: 'Total Price', icon: Tag, fallback: 'totalPrice' },
+    { key: 'customerName', label: 'Customer', icon: User, fallback: 'customer' },
+    { key: 'customerId', label: 'Customer ID', icon: User },
+    { key: 'mobileNumber', label: 'Mobile', icon: User },
+    { key: 'warehouse', label: 'Warehouse', icon: Warehouse },
+    { key: 'date', label: 'Date', icon: Calendar }
+  ];
+
+  // Columns for Paddy Stock Report
+  const paddyStockColumns = [
+    { key: 'paddyType', label: 'Paddy Type', icon: Wheat },
+    { key: 'quantity', label: 'Quantity (kg)', icon: Scale, fallback: 'paddyQuantity' },
     { key: 'moistureLevel', label: 'Moisture %', icon: Droplets },
     { key: 'warehouse', label: 'Warehouse', icon: Warehouse },
-    { key: 'supplier', label: 'Supplier', icon: User },
-    { key: 'actionType', label: 'Action Type', icon: Tag },
+    { key: 'supplier', label: 'Supplier', icon: User, fallback: 'supplierName' },
+    { key: 'user', label: 'Added By', icon: User },
     { key: 'date', label: 'Date', icon: Calendar }
   ];
 
-  const riceColumns = [
+  // Columns for Rice Sale Report
+  const riceSaleColumns = [
     { key: 'riceType', label: 'Rice Type', icon: Package },
-    { key: 'grade', label: 'Grade', icon: Tag },
-    { key: 'quantity', label: 'Quantity', icon: Package },
-    { key: 'warehouse', label: 'Warehouse', icon: Warehouse },
+    { key: 'quantity', label: 'Quantity (kg)', icon: Scale, fallback: 'riceQuantity' },
     { key: 'pricePerKg', label: 'Price/kg', icon: Tag },
-    { key: 'actionType', label: 'Action Type', icon: Tag },
+    { key: 'totalAmount', label: 'Total Price', icon: Tag, fallback: 'totalPrice' },
+    { key: 'customerName', label: 'Customer', icon: User, fallback: 'customer' },
+    { key: 'mobileNumber', label: 'Mobile', icon: User },
     { key: 'date', label: 'Date', icon: Calendar }
   ];
 
-  const columns = isPaddyReport ? paddyColumns : riceColumns;
+  // Columns for Rice Stock Report
+  const riceStockColumns = [
+    { key: 'riceType', label: 'Rice Type', icon: Package },
+    { key: 'quantity', label: 'Quantity (kg)', icon: Scale, fallback: 'riceQuantity' },
+    { key: 'pricePerKg', label: 'Price/kg', icon: Tag },
+    { key: 'totalAmount', label: 'Total Amount', icon: Tag, fallback: 'totalPrice' },
+    { key: 'supplierName', label: 'Supplier', icon: User, fallback: 'supplier' },
+    { key: 'mobileNumber', label: 'Mobile', icon: User },
+    { key: 'user', label: 'Added By', icon: User },
+    { key: 'date', label: 'Date', icon: Calendar }
+  ];
+
+  // Select columns based on report type
+  const getColumns = () => {
+    if (isPaddyThreshing) return paddyThreshingColumns;
+    if (isPaddySale) return paddySaleColumns;
+    if (isPaddyStock) return paddyStockColumns;
+    if (isRiceSale) return riceSaleColumns;
+    if (isRiceStock) return riceStockColumns;
+    // Default fallback
+    if (isPaddyReport) return paddyStockColumns;
+    if (isRiceReport) return riceStockColumns;
+    return paddyThreshingColumns;
+  };
+
+  const columns = getColumns();
+
+  // Get value with fallback support
+  const getValue = (row, column) => {
+    let value = row[column.key];
+    // Try fallback if primary key is undefined/null
+    if ((value === undefined || value === null) && column.fallback) {
+      value = row[column.fallback];
+    }
+    return value;
+  };
 
   const formatValue = (key, value) => {
-    if (!value && value !== 0) return 'N/A';
+    if (value === undefined || value === null || value === '') return 'N/A';
 
     switch (key) {
       case 'date':
         return formatDate(value);
       case 'quantity':
+      case 'paddyQuantity':
+      case 'riceQuantity':
+      case 'brokenRiceQuantity':
+      case 'polishRiceQuantity':
         return formatNumber(value) + ' kg';
       case 'moistureLevel':
         return formatPercentage(value);
       case 'pricePerKg':
+      case 'totalPrice':
+      case 'totalAmount':
         return formatCurrency(value);
       default:
         return value;
@@ -118,31 +195,47 @@ const ReportTable = ({ data = [], reportType, loading = false }) => {
                 transition={{ delay: rowIndex * 0.05 }}
                 className="hover:bg-green-50/50 dark:hover:bg-white/5 transition-colors duration-150"
               >
-                {columns.map((column) => (
-                  <td
-                    key={column.key}
-                    className="px-4 py-3 text-sm text-gray-900 dark:text-white/90"
-                  >
-                    {column.key === 'actionType' ? (
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                        ${row[column.key] === 'Sale' 
-                          ? 'bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-300' 
-                          : row[column.key] === 'Add Stock'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-500/20 dark:text-green-300'
-                          : 'bg-blue-100 text-blue-800 dark:bg-blue-500/20 dark:text-blue-300'
-                        }`}>
-                        {row[column.key]}
-                      </span>
-                    ) : column.key === 'grade' ? (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                     bg-purple-100 text-purple-800 dark:bg-purple-500/20 dark:text-purple-300">
-                        {row[column.key]}
-                      </span>
-                    ) : (
-                      formatValue(column.key, row[column.key])
-                    )}
-                  </td>
-                ))}
+                {columns.map((column) => {
+                  const value = getValue(row, column);
+                  return (
+                    <td
+                      key={column.key}
+                      className="px-4 py-3 text-sm text-gray-900 dark:text-white/90 whitespace-nowrap"
+                    >
+                      {column.key === 'actionType' ? (
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                          ${value === 'Sale' 
+                            ? 'bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-300' 
+                            : value === 'Add Stock'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-500/20 dark:text-green-300'
+                            : value === 'Threshing'
+                            ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300'
+                            : 'bg-blue-100 text-blue-800 dark:bg-blue-500/20 dark:text-blue-300'
+                          }`}>
+                          {value || 'N/A'}
+                        </span>
+                      ) : column.key === 'grade' ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                       bg-purple-100 text-purple-800 dark:bg-purple-500/20 dark:text-purple-300">
+                          {value || 'N/A'}
+                        </span>
+                      ) : column.key === 'paddyType' || column.key === 'riceType' ? (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold
+                                       bg-gradient-to-r from-green-100 to-emerald-100 text-green-800
+                                       dark:from-green-500/20 dark:to-emerald-500/20 dark:text-green-300">
+                          {value || 'N/A'}
+                        </span>
+                      ) : column.key === 'brokenRiceType' || column.key === 'polishRiceType' ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                                       bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                          {value || 'N/A'}
+                        </span>
+                      ) : (
+                        formatValue(column.key, value)
+                      )}
+                    </td>
+                  );
+                })}
               </motion.tr>
             ))}
           </tbody>

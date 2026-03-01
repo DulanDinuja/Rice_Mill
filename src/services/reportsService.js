@@ -44,6 +44,12 @@ export const reportsService = {
       const result = await reportsService.getReports(fromDate, toDate, reportType);
       const data = result.data;
       const groupedData = {};
+      const normalizedType = reportType?.toUpperCase() || '';
+      const isPaddyThreshing = normalizedType.includes('PADDY_THRESHING');
+      const isPaddySale = normalizedType.includes('PADDY_SALE');
+      const isRiceSale = normalizedType.includes('RICE_SALE');
+      const isRiceReport = normalizedType.includes('RICE');
+      const isPaddyReport = normalizedType.includes('PADDY');
 
       data.forEach(item => {
         const date = new Date(item.date);
@@ -51,24 +57,47 @@ export const reportsService = {
 
         if (!groupedData[monthKey]) {
           groupedData[monthKey] = {
-            month: date.toLocaleDateString('en-US', { month: 'short' }),
+            month: date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
             rice: 0,
             paddy: 0,
-            quantity: 0
+            quantity: 0,
+            totalAmount: 0
           };
         }
 
-        const quantity = item.quantity || item.paddyQuantity || 0;
-        groupedData[monthKey].quantity += quantity;
-
-        if (reportType.includes('RICE')) {
-          groupedData[monthKey].rice += quantity;
-        } else {
-          groupedData[monthKey].paddy += quantity;
+        // Handle different quantity fields based on report type
+        if (isPaddyThreshing) {
+          // For threshing, we track both paddy input and rice output
+          groupedData[monthKey].paddy += item.paddyQuantity || 0;
+          groupedData[monthKey].rice += item.riceQuantity || 0;
+          groupedData[monthKey].quantity += item.paddyQuantity || 0;
+        } else if (isPaddySale) {
+          // For paddy sales, track quantity and total amount
+          const qty = item.quantity || item.paddyQuantity || 0;
+          groupedData[monthKey].paddy += qty;
+          groupedData[monthKey].quantity += qty;
+          groupedData[monthKey].totalAmount += item.totalAmount || item.totalPrice || 0;
+        } else if (isRiceSale) {
+          // For rice sales, track quantity and total amount
+          const qty = item.quantity || item.riceQuantity || 0;
+          groupedData[monthKey].rice += qty;
+          groupedData[monthKey].quantity += qty;
+          groupedData[monthKey].totalAmount += item.totalAmount || item.totalPrice || 0;
+        } else if (isRiceReport) {
+          const qty = item.quantity || item.riceQuantity || 0;
+          groupedData[monthKey].rice += qty;
+          groupedData[monthKey].quantity += qty;
+        } else if (isPaddyReport) {
+          const qty = item.quantity || item.paddyQuantity || 0;
+          groupedData[monthKey].paddy += qty;
+          groupedData[monthKey].quantity += qty;
         }
       });
 
-      return Object.values(groupedData);
+      // Sort by month key and return
+      return Object.entries(groupedData)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([, value]) => value);
     } catch (error) {
       console.error('Error generating chart data:', error);
       return [];

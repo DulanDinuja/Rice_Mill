@@ -4,7 +4,7 @@ import ReportFilters from '../components/reports/ReportFilters';
 import ReportTable from '../components/reports/ReportTable';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell, Line, AreaChart, Area, ComposedChart } from 'recharts';
 import { reportsService } from '../services/reportsService';
-import { Download, FileText, TrendingUp, DollarSign, Wheat, Box, Package, Activity, Layers } from 'lucide-react';
+import { Download, FileText, TrendingUp, DollarSign, Wheat, Box, Package, Activity, Layers, Printer } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 // Color palette for charts
@@ -115,46 +115,89 @@ const Reports = () => {
       return;
     }
 
-    // Determine report type name
+    // Determine report type name (handle both uppercase and lowercase)
+    const normalizedType = filters.reportType.toUpperCase();
     const reportTypeNames = {
-      paddy_threshing: 'Paddy Threshing Report',
-      paddy_sale: 'Paddy Sale Report',
-      paddy_add_stock: 'Paddy Add Stock Report',
-      rice_sale: 'Rice Sale Report',
-      rice_add_stock: 'Rice Add Stock Report'
+      PADDY_THRESHING: 'Paddy Threshing Report',
+      PADDY_SALE: 'Paddy Sale Report',
+      PADDY_STOCK: 'Paddy Stock Report',
+      RICE_SALE: 'Rice Sale Report',
+      RICE_STOCK: 'Rice Stock Report'
     };
 
-    const reportTypeName = reportTypeNames[filters.reportType] || 'Report';
+    const reportTypeName = reportTypeNames[normalizedType] || 'Report';
+    const isPaddyThreshing = normalizedType === 'PADDY_THRESHING';
+    const isPaddySale = normalizedType === 'PADDY_SALE';
+    const isPaddyStock = normalizedType === 'PADDY_STOCK';
+    const isRiceSale = normalizedType === 'RICE_SALE';
 
-    // Create CSV content
-    const isPaddyReport = filters.reportType?.includes('paddy');
-    const headers = isPaddyReport
-      ? ['Paddy Type', 'Quantity', 'Moisture %', 'Warehouse', 'Supplier', 'Action Type', 'Date']
-      : ['Rice Type', 'Grade', 'Quantity', 'Warehouse', 'Price/kg', 'Action Type', 'Date'];
+    // Create CSV content based on report type
+    let headers, rows;
 
-    const rows = reportData.map(row => {
-      if (isPaddyReport) {
-        return [
-          row.paddyType || 'N/A',
-          row.quantity || 0,
-          row.moistureLevel || 'N/A',
-          row.warehouse || 'N/A',
-          row.supplier || 'N/A',
-          row.actionType || 'N/A',
-          new Date(row.date).toLocaleDateString()
-        ];
-      } else {
-        return [
-          row.riceType || 'N/A',
-          row.grade || 'N/A',
-          row.quantity || 0,
-          row.warehouse || 'N/A',
-          row.pricePerKg || 'N/A',
-          row.actionType || 'N/A',
-          new Date(row.date).toLocaleDateString()
-        ];
-      }
-    });
+    if (isPaddyThreshing) {
+      headers = ['Paddy Type', 'Paddy Qty (kg)', 'Rice Type', 'Rice Qty (kg)', 'Broken Rice Type', 'Broken Qty (kg)', 'Polish Rice Type', 'Polish Qty (kg)', 'Warehouse', 'User', 'Date'];
+      rows = reportData.map(row => [
+        row.paddyType || 'N/A',
+        row.paddyQuantity || 0,
+        row.riceType || 'N/A',
+        row.riceQuantity || 0,
+        row.brokenRiceType || 'N/A',
+        row.brokenRiceQuantity || 0,
+        row.polishRiceType || 'N/A',
+        row.polishRiceQuantity || 0,
+        row.warehouse || 'N/A',
+        row.user || 'N/A',
+        row.date ? new Date(row.date).toLocaleDateString() : 'N/A'
+      ]);
+    } else if (isPaddySale) {
+      headers = ['Paddy Type', 'Quantity (kg)', 'Price/kg', 'Total Amount', 'Customer Name', 'Customer ID', 'Mobile', 'Warehouse', 'Date'];
+      rows = reportData.map(row => [
+        row.paddyType || 'N/A',
+        row.quantity || row.paddyQuantity || 0,
+        row.pricePerKg || 'N/A',
+        row.totalAmount || row.totalPrice || 0,
+        row.customerName || row.customer || 'N/A',
+        row.customerId || 'N/A',
+        row.mobileNumber || 'N/A',
+        row.warehouse || 'N/A',
+        row.date ? new Date(row.date).toLocaleDateString() : 'N/A'
+      ]);
+    } else if (isPaddyStock) {
+      headers = ['Paddy Type', 'Quantity (kg)', 'Moisture %', 'Warehouse', 'Supplier', 'User', 'Date'];
+      rows = reportData.map(row => [
+        row.paddyType || 'N/A',
+        row.quantity || row.paddyQuantity || 0,
+        row.moistureLevel || 'N/A',
+        row.warehouse || 'N/A',
+        row.supplier || row.supplierName || 'N/A',
+        row.user || 'N/A',
+        row.date ? new Date(row.date).toLocaleDateString() : 'N/A'
+      ]);
+    } else if (isRiceSale) {
+      headers = ['Rice Type', 'Quantity (kg)', 'Price/kg', 'Total Price', 'Customer', 'Mobile', 'Date'];
+      rows = reportData.map(row => [
+        row.riceType || 'N/A',
+        row.quantity || row.riceQuantity || 0,
+        row.pricePerKg || 'N/A',
+        row.totalAmount || row.totalPrice || 0,
+        row.customerName || row.customer || 'N/A',
+        row.mobileNumber || 'N/A',
+        row.date ? new Date(row.date).toLocaleDateString() : 'N/A'
+      ]);
+    } else {
+      // Rice Stock or other rice reports
+      headers = ['Rice Type', 'Quantity (kg)', 'Price/kg', 'Total Amount', 'Supplier', 'Mobile', 'User', 'Date'];
+      rows = reportData.map(row => [
+        row.riceType || 'N/A',
+        row.quantity || row.riceQuantity || 0,
+        row.pricePerKg || 0,
+        row.totalAmount || row.totalPrice || 0,
+        row.supplierName || row.supplier || 'N/A',
+        row.mobileNumber || 'N/A',
+        row.user || 'N/A',
+        row.date ? new Date(row.date).toLocaleDateString() : 'N/A'
+      ]);
+    }
 
     const csvContent = [
       [reportTypeName],
@@ -175,6 +218,420 @@ const Reports = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handlePrintReport = () => {
+    if (!filters.reportType || reportData.length === 0) {
+      alert('Please generate a report first');
+      return;
+    }
+
+    // Determine report type name (handle both uppercase and lowercase)
+    const normalizedType = filters.reportType.toUpperCase();
+    const reportTypeNames = {
+      PADDY_THRESHING: 'Paddy Threshing Report',
+      PADDY_SALE: 'Paddy Sale Report',
+      PADDY_STOCK: 'Paddy Stock Report',
+      RICE_SALE: 'Rice Sale Report',
+      RICE_STOCK: 'Rice Stock Report'
+    };
+
+    const reportTypeName = reportTypeNames[normalizedType] || 'Report';
+    const isPaddyThreshing = normalizedType === 'PADDY_THRESHING';
+    const isPaddySale = normalizedType === 'PADDY_SALE';
+    const isPaddyStock = normalizedType === 'PADDY_STOCK';
+    const isPaddyReport = normalizedType.includes('PADDY');
+    const isRiceSale = normalizedType === 'RICE_SALE';
+
+    // Create print window
+    const printWindow = window.open('', '_blank');
+
+    // Generate table HTML based on report type
+    let tableHeaders, tableRows, totalQuantity, totalAmount;
+
+    if (isPaddyThreshing) {
+      tableHeaders = ['#', 'Paddy Type', 'Paddy Qty', 'Rice Type', 'Rice Qty', 'Broken Rice', 'Broken Qty', 'Polish Rice', 'Polish Qty', 'Warehouse', 'User', 'Date'];
+      tableRows = reportData.map((row, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td><strong>${row.paddyType || 'N/A'}</strong></td>
+          <td>${(row.paddyQuantity || 0).toLocaleString()} kg</td>
+          <td>${row.riceType || 'N/A'}</td>
+          <td>${(row.riceQuantity || 0).toLocaleString()} kg</td>
+          <td>${row.brokenRiceType || 'N/A'}</td>
+          <td>${(row.brokenRiceQuantity || 0).toLocaleString()} kg</td>
+          <td>${row.polishRiceType || 'N/A'}</td>
+          <td>${(row.polishRiceQuantity || 0).toLocaleString()} kg</td>
+          <td>${row.warehouse || 'N/A'}</td>
+          <td>${row.user || 'N/A'}</td>
+          <td>${row.date ? new Date(row.date).toLocaleDateString() : 'N/A'}</td>
+        </tr>
+      `).join('');
+      totalQuantity = reportData.reduce((sum, item) => sum + (item.paddyQuantity || 0), 0);
+      totalAmount = 0;
+    } else if (isPaddySale) {
+      tableHeaders = ['#', 'Paddy Type', 'Quantity', 'Price/kg', 'Total Amount', 'Customer', 'Customer ID', 'Mobile', 'Warehouse', 'Date'];
+      tableRows = reportData.map((row, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td><strong>${row.paddyType || 'N/A'}</strong></td>
+          <td>${(row.quantity || row.paddyQuantity || 0).toLocaleString()} kg</td>
+          <td>Rs. ${(row.pricePerKg || 0).toLocaleString()}</td>
+          <td><strong>Rs. ${(row.totalAmount || row.totalPrice || 0).toLocaleString()}</strong></td>
+          <td>${row.customerName || row.customer || 'N/A'}</td>
+          <td>${row.customerId || 'N/A'}</td>
+          <td>${row.mobileNumber || 'N/A'}</td>
+          <td>${row.warehouse || 'N/A'}</td>
+          <td>${row.date ? new Date(row.date).toLocaleDateString() : 'N/A'}</td>
+        </tr>
+      `).join('');
+      totalQuantity = reportData.reduce((sum, item) => sum + (item.quantity || item.paddyQuantity || 0), 0);
+      totalAmount = reportData.reduce((sum, item) => sum + (item.totalAmount || item.totalPrice || 0), 0);
+    } else if (isPaddyStock) {
+      tableHeaders = ['#', 'Paddy Type', 'Quantity', 'Moisture %', 'Warehouse', 'Supplier', 'User', 'Date'];
+      tableRows = reportData.map((row, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td><strong>${row.paddyType || 'N/A'}</strong></td>
+          <td>${(row.quantity || row.paddyQuantity || 0).toLocaleString()} kg</td>
+          <td>${row.moistureLevel || 'N/A'}%</td>
+          <td>${row.warehouse || 'N/A'}</td>
+          <td>${row.supplier || row.supplierName || 'N/A'}</td>
+          <td>${row.user || 'N/A'}</td>
+          <td>${row.date ? new Date(row.date).toLocaleDateString() : 'N/A'}</td>
+        </tr>
+      `).join('');
+      totalQuantity = reportData.reduce((sum, item) => sum + (item.quantity || item.paddyQuantity || 0), 0);
+      totalAmount = 0;
+    } else if (isRiceSale) {
+      tableHeaders = ['#', 'Rice Type', 'Quantity', 'Price/kg', 'Total Amount', 'Customer', 'Mobile', 'Date'];
+      tableRows = reportData.map((row, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td><strong>${row.riceType || 'N/A'}</strong></td>
+          <td>${(row.quantity || row.riceQuantity || 0).toLocaleString()} kg</td>
+          <td>Rs. ${(row.pricePerKg || 0).toLocaleString()}</td>
+          <td><strong>Rs. ${(row.totalAmount || row.totalPrice || 0).toLocaleString()}</strong></td>
+          <td>${row.customerName || row.customer || 'N/A'}</td>
+          <td>${row.mobileNumber || 'N/A'}</td>
+          <td>${row.date ? new Date(row.date).toLocaleDateString() : 'N/A'}</td>
+        </tr>
+      `).join('');
+      totalQuantity = reportData.reduce((sum, item) => sum + (item.quantity || item.riceQuantity || 0), 0);
+      totalAmount = reportData.reduce((sum, item) => sum + (item.totalAmount || item.totalPrice || 0), 0);
+    } else {
+      // Rice Stock
+      tableHeaders = ['#', 'Rice Type', 'Quantity', 'Price/kg', 'Total Amount', 'Supplier', 'Mobile', 'User', 'Date'];
+      tableRows = reportData.map((row, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td><strong>${row.riceType || 'N/A'}</strong></td>
+          <td>${(row.quantity || row.riceQuantity || 0).toLocaleString()} kg</td>
+          <td>Rs. ${(row.pricePerKg || 0).toLocaleString()}</td>
+          <td><strong>Rs. ${(row.totalAmount || row.totalPrice || 0).toLocaleString()}</strong></td>
+          <td>${row.supplierName || row.supplier || 'N/A'}</td>
+          <td>${row.mobileNumber || 'N/A'}</td>
+          <td>${row.user || 'N/A'}</td>
+          <td>${row.date ? new Date(row.date).toLocaleDateString() : 'N/A'}</td>
+        </tr>
+      `).join('');
+      totalQuantity = reportData.reduce((sum, item) => sum + (item.quantity || item.riceQuantity || 0), 0);
+      totalAmount = reportData.reduce((sum, item) => sum + (item.totalAmount || item.totalPrice || 0), 0);
+    }
+
+    // Calculate additional summaries based on report type
+    let additionalSummary;
+    if (isPaddyThreshing) {
+      additionalSummary = `
+        <div class="summary-card orange">
+          <div class="summary-label">Total Rice Produced</div>
+          <div class="summary-value">${reportData.reduce((sum, item) => sum + (item.riceQuantity || 0), 0).toLocaleString()} kg</div>
+        </div>
+        <div class="summary-card purple">
+          <div class="summary-label">Total Broken Rice</div>
+          <div class="summary-value">${reportData.reduce((sum, item) => sum + (item.brokenRiceQuantity || 0), 0).toLocaleString()} kg</div>
+        </div>
+      `;
+    } else if (isPaddySale || isRiceSale) {
+      additionalSummary = `
+        <div class="summary-card orange">
+          <div class="summary-label">Total Sales Amount</div>
+          <div class="summary-value">Rs. ${totalAmount.toLocaleString()}</div>
+        </div>
+        <div class="summary-card purple">
+          <div class="summary-label">Report Type</div>
+          <div class="summary-value" style="font-size: 14px;">${isPaddyReport ? 'Paddy Sale' : 'Rice Sale'}</div>
+        </div>
+      `;
+    } else {
+      additionalSummary = `
+        <div class="summary-card purple">
+          <div class="summary-label">Report Type</div>
+          <div class="summary-value" style="font-size: 14px;">${isPaddyReport ? 'Paddy Stock' : 'Rice Stock'}</div>
+        </div>
+      `;
+    }
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${reportTypeName}</title>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px;
+            background: #fff;
+            color: #333;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #2E7D32;
+          }
+          .logo-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+          }
+          .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #2E7D32, #4CAF50);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+          }
+          .company-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2E7D32;
+          }
+          .report-title {
+            font-size: 22px;
+            color: #333;
+            margin-top: 10px;
+            font-weight: 600;
+          }
+          .meta-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8fdf8, #e8f5e9);
+            border-radius: 12px;
+            border: 1px solid #c8e6c9;
+          }
+          .meta-item {
+            text-align: center;
+          }
+          .meta-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+          }
+          .meta-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2E7D32;
+            margin-top: 5px;
+          }
+          .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+          }
+          .summary-card {
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+          }
+          .summary-card.green {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            border: 1px solid #a5d6a7;
+          }
+          .summary-card.blue {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border: 1px solid #90caf9;
+          }
+          .summary-card.purple {
+            background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+            border: 1px solid #ce93d8;
+          }
+          .summary-card.orange {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            border: 1px solid #ffcc80;
+          }
+          .summary-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+          }
+          .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 8px;
+          }
+          .summary-card.green .summary-value { color: #2E7D32; }
+          .summary-card.blue .summary-value { color: #1976D2; }
+          .summary-card.purple .summary-value { color: #7B1FA2; }
+          .summary-card.orange .summary-value { color: #E65100; }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+          }
+          th {
+            background: linear-gradient(135deg, #2E7D32, #388E3C);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+          }
+          tr:nth-child(even) {
+            background-color: #f8fdf8;
+          }
+          tr:hover {
+            background-color: #e8f5e9;
+          }
+          .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #666;
+          }
+          .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            padding-top: 40px;
+          }
+          .signature-box {
+            text-align: center;
+            width: 200px;
+          }
+          .signature-line {
+            border-top: 2px solid #333;
+            margin-bottom: 10px;
+          }
+          .signature-label {
+            font-size: 14px;
+            color: #333;
+          }
+          @media print {
+            body { padding: 20px; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="logo-section">
+            <div class="logo">RM</div>
+            <span class="company-name">Rice Mill Management</span>
+          </div>
+          <div class="report-title">${reportTypeName}</div>
+        </div>
+
+        <div class="meta-info">
+          <div class="meta-item">
+            <div class="meta-label">Report Generated</div>
+            <div class="meta-value">${new Date().toLocaleString()}</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Date Range</div>
+            <div class="meta-value">${filters.fromDate || 'All Time'} to ${filters.toDate || 'Today'}</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Warehouse</div>
+            <div class="meta-value">${filters.warehouse || 'All Warehouses'}</div>
+          </div>
+        </div>
+
+        <div class="summary-cards">
+          <div class="summary-card green">
+            <div class="summary-label">Total Records</div>
+            <div class="summary-value">${reportData.length}</div>
+          </div>
+          <div class="summary-card blue">
+            <div class="summary-label">${isPaddyThreshing ? 'Total Paddy Processed' : 'Total Quantity'}</div>
+            <div class="summary-value">${totalQuantity.toLocaleString()} kg</div>
+          </div>
+          ${additionalSummary}
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              ${tableHeaders.map(h => `<th>${h}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+
+        <div class="signature-section">
+          <div class="signature-box">
+            <div class="signature-line"></div>
+            <div class="signature-label">Prepared By</div>
+          </div>
+          <div class="signature-box">
+            <div class="signature-line"></div>
+            <div class="signature-label">Verified By</div>
+          </div>
+          <div class="signature-box">
+            <div class="signature-line"></div>
+            <div class="signature-label">Approved By</div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <div>Rice Mill Management System © ${new Date().getFullYear()}</div>
+          <div>Page 1 of 1</div>
+        </div>
+
+        <script>
+          window.onload = function() {
+            window.print();
+          }
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
   };
 
   return (
@@ -736,6 +1193,7 @@ const Reports = () => {
         onFilterChange={setFilters}
         onGenerateReport={handleGenerateReport}
         onExportReport={handleExportReport}
+        onPrintReport={handlePrintReport}
         warehouses={warehouses}
         suppliers={suppliers}
         loading={loading}
@@ -775,7 +1233,7 @@ const Reports = () => {
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total Quantity</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {reportData.reduce((sum, item) => sum + (item.quantity || 0), 0).toLocaleString()} kg
+                  {reportData.reduce((sum, item) => sum + (item.quantity || item.paddyQuantity || item.riceQuantity || 0), 0).toLocaleString()} kg
                 </p>
               </div>
             </div>
@@ -807,7 +1265,7 @@ const Reports = () => {
       {chartData.length > 0 && (
         <GlassCard>
           <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4 md:mb-6">
-            Stock Movement Summary
+            {filters.reportType?.toUpperCase().includes('SALE') ? 'Sales Summary' : 'Stock Movement Summary'}
           </h3>
           <ResponsiveContainer width="100%" height={300} className="md:h-[400px]">
             <BarChart data={chartData}>
@@ -822,13 +1280,23 @@ const Reports = () => {
                   color: '#263238'
                 }}
                 className="dark:[&>div]:!bg-[rgba(26,26,46,0.9)] dark:[&>div]:!border-[rgba(0,255,136,0.3)] dark:[&>div]:!text-white"
+                formatter={(value, name) => [
+                  name === 'totalAmount' ? `Rs. ${value.toLocaleString()}` : `${value.toLocaleString()} kg`,
+                  name === 'totalAmount' ? 'Sales Amount' : name === 'paddy' ? 'Paddy Quantity' : 'Rice Quantity'
+                ]}
               />
               <Legend />
-              {filters.reportType?.includes('rice') && (
-                <Bar dataKey="rice" fill="#2E7D32" className="dark:fill-[#00FF88]" name="Rice (kg)" />
+              {/* Show rice bar for rice reports and threshing reports */}
+              {(filters.reportType?.toUpperCase().includes('RICE') || filters.reportType?.toUpperCase().includes('THRESHING')) && (
+                <Bar dataKey="rice" fill="#2E7D32" className="dark:fill-[#00FF88]" name="Rice (kg)" radius={[4, 4, 0, 0]} />
               )}
-              {filters.reportType?.includes('paddy') && (
-                <Bar dataKey="paddy" fill="#66BB6A" className="dark:fill-[#8A2BE2]" name="Paddy (kg)" />
+              {/* Show paddy bar for paddy reports */}
+              {filters.reportType?.toUpperCase().includes('PADDY') && !filters.reportType?.toUpperCase().includes('THRESHING') && (
+                <Bar dataKey="paddy" fill="#F59E0B" className="dark:fill-[#FCD34D]" name="Paddy (kg)" radius={[4, 4, 0, 0]} />
+              )}
+              {/* Show total amount bar for sale reports */}
+              {filters.reportType?.toUpperCase().includes('SALE') && (
+                <Bar dataKey="totalAmount" fill="#8B5CF6" className="dark:fill-[#A78BFA]" name="Sales Amount (Rs.)" radius={[4, 4, 0, 0]} />
               )}
             </BarChart>
           </ResponsiveContainer>
