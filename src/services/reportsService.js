@@ -19,6 +19,107 @@ export const reportsService = {
     return axiosInstance.get('/reports/all-system-data');
   },
 
+  // Get filtered system data by date range
+  getFilteredSystemData: async (fromDate, toDate) => {
+    if (USE_MOCK) {
+      return { data: {} };
+    }
+
+    // If no date filters, return all data
+    if (!fromDate && !toDate) {
+      return axiosInstance.get('/reports/all-system-data');
+    }
+
+    try {
+      // Fetch all report types with date filter
+      const [paddyStock, paddySale, paddyThreshing, riceStock, riceSale] = await Promise.all([
+        reportsService.generateReport({ fromDate, toDate, reportType: 'PADDY_STOCK' }),
+        reportsService.generateReport({ fromDate, toDate, reportType: 'PADDY_SALE' }),
+        reportsService.generateReport({ fromDate, toDate, reportType: 'PADDY_THRESHING' }),
+        reportsService.generateReport({ fromDate, toDate, reportType: 'RICE_STOCK' }),
+        reportsService.generateReport({ fromDate, toDate, reportType: 'RICE_SALE' })
+      ]);
+
+      // Calculate summary from filtered data
+      let totalPaddyStock = 0;
+      let totalRiceStock = 0;
+      let totalBrokenRice = 0;
+      let totalPolishRice = 0;
+      let totalPaddySales = 0;
+      let totalRiceSales = 0;
+
+      // Process paddy stock
+      const paddyData = {};
+      (paddyStock.data || []).forEach(item => {
+        const type = item.paddyType || 'Unknown';
+        if (!paddyData[type]) {
+          paddyData[type] = { totalStock: 0, totalSales: 0, totalRevenue: 0 };
+        }
+        paddyData[type].totalStock += item.quantity || item.paddyQuantity || 0;
+        totalPaddyStock += item.quantity || item.paddyQuantity || 0;
+      });
+
+      // Process paddy sales
+      (paddySale.data || []).forEach(item => {
+        const type = item.paddyType || 'Unknown';
+        if (!paddyData[type]) {
+          paddyData[type] = { totalStock: 0, totalSales: 0, totalRevenue: 0 };
+        }
+        paddyData[type].totalSales += item.quantity || 0;
+        paddyData[type].totalRevenue += item.totalAmount || item.totalPrice || 0;
+        totalPaddySales += item.totalAmount || item.totalPrice || 0;
+      });
+
+      // Process threshing
+      const threshingData = paddyThreshing.data || [];
+      threshingData.forEach(item => {
+        totalRiceStock += item.riceQuantity || 0;
+        totalBrokenRice += item.brokenRiceQuantity || 0;
+        totalPolishRice += item.polishRiceQuantity || 0;
+      });
+
+      // Process rice stock
+      const riceData = {};
+      (riceStock.data || []).forEach(item => {
+        const type = item.riceType || 'Unknown';
+        if (!riceData[type]) {
+          riceData[type] = { totalStock: 0, totalSales: 0, totalRevenue: 0, totalBrokenRice: 0, totalPolishRice: 0 };
+        }
+        riceData[type].totalStock += item.quantity || item.riceQuantity || 0;
+      });
+
+      // Process rice sales
+      (riceSale.data || []).forEach(item => {
+        const type = item.riceType || 'Unknown';
+        if (!riceData[type]) {
+          riceData[type] = { totalStock: 0, totalSales: 0, totalRevenue: 0, totalBrokenRice: 0, totalPolishRice: 0 };
+        }
+        riceData[type].totalSales += item.quantity || 0;
+        riceData[type].totalRevenue += item.totalAmount || item.totalPrice || 0;
+        totalRiceSales += item.totalAmount || item.totalPrice || 0;
+      });
+
+      return {
+        data: {
+          summary: {
+            totalPaddyStock,
+            totalRiceStock,
+            totalBrokenRice,
+            totalPolishRice,
+            totalPaddySales,
+            totalRiceSales
+          },
+          paddyData,
+          riceData,
+          threshingData
+        }
+      };
+    } catch (error) {
+      console.error('Error fetching filtered system data:', error);
+      return { data: {} };
+    }
+  },
+
   generateReport: async (reportRequest) => {
     if (USE_MOCK) {
       return { data: [] };

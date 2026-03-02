@@ -4,7 +4,7 @@ import ReportFilters from '../components/reports/ReportFilters';
 import ReportTable from '../components/reports/ReportTable';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell, Line, AreaChart, Area, ComposedChart } from 'recharts';
 import { reportsService } from '../services/reportsService';
-import { Download, FileText, TrendingUp, DollarSign, Wheat, Box, Package, Activity, Layers, Printer } from 'lucide-react';
+import { Download, FileText, TrendingUp, DollarSign, Wheat, Box, Package, Activity, Layers, Sparkles, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 // Color palette for charts
@@ -30,12 +30,94 @@ const Reports = () => {
     supplier: ''
   });
 
+  // Overview date filter state
+  const [overviewDateFilter, setOverviewDateFilter] = useState({
+    fromDate: '',
+    toDate: ''
+  });
+  const [activeOverviewQuickDate, setActiveOverviewQuickDate] = useState('all');
+
   const [reportData, setReportData] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [systemData, setSystemData] = useState(null);
+  const [filteredSystemData, setFilteredSystemData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [warehouses, setWarehouses] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
+
+  // Quick date ranges for overview
+  const overviewQuickDateRanges = [
+    { label: 'Today', value: 'today', icon: '📅' },
+    { label: 'This Week', value: 'week', icon: '📆' },
+    { label: 'This Month', value: 'month', icon: '🗓️' },
+    { label: 'Last 3 Months', value: '3months', icon: '📊' },
+    { label: 'Last 6 Months', value: '6months', icon: '📈' },
+    { label: 'This Year', value: 'year', icon: '🎯' },
+    { label: 'All Time', value: 'all', icon: '♾️' }
+  ];
+
+  // Handle overview quick date selection
+  const handleOverviewQuickDate = (rangeType) => {
+    setActiveOverviewQuickDate(rangeType);
+    const today = new Date();
+    let fromDate;
+
+    switch (rangeType) {
+      case 'today':
+        fromDate = new Date(today);
+        break;
+      case 'week':
+        fromDate = new Date(today);
+        fromDate.setDate(today.getDate() - today.getDay());
+        break;
+      case 'month':
+        fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        break;
+      case '3months':
+        fromDate = new Date(today);
+        fromDate.setMonth(today.getMonth() - 3);
+        break;
+      case '6months':
+        fromDate = new Date(today);
+        fromDate.setMonth(today.getMonth() - 6);
+        break;
+      case 'year':
+        fromDate = new Date(today.getFullYear(), 0, 1);
+        break;
+      case 'all':
+        setOverviewDateFilter({ fromDate: '', toDate: '' });
+        return;
+      default:
+        fromDate = new Date(today);
+    }
+
+    setOverviewDateFilter({
+      fromDate: fromDate.toISOString().split('T')[0],
+      toDate: today.toISOString().split('T')[0]
+    });
+  };
+
+  // Fetch filtered system data when date filter changes
+  const [overviewLoading, setOverviewLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchFilteredData = async () => {
+      setOverviewLoading(true);
+      try {
+        const response = await reportsService.getFilteredSystemData(
+          overviewDateFilter.fromDate,
+          overviewDateFilter.toDate
+        );
+        setFilteredSystemData(response.data);
+      } catch (error) {
+        console.error('Error fetching filtered data:', error);
+      } finally {
+        setOverviewLoading(false);
+      }
+    };
+
+    fetchFilteredData();
+  }, [overviewDateFilter]);
 
   // Initialize warehouses and suppliers
   useEffect(() => {
@@ -49,6 +131,7 @@ const Reports = () => {
         setWarehouses(warehousesRes.data || []);
         setSuppliers(suppliersRes.data || []);
         setSystemData(systemDataRes.data);
+        setFilteredSystemData(systemDataRes.data);
       } catch (error) {
         console.error('Error loading filters:', error);
         setWarehouses([]);
@@ -646,8 +729,126 @@ const Reports = () => {
         </p>
       </div>
 
+      {/* Overview Quick Date Selection */}
+      <GlassCard>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-amber-500" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Overview Date Filter</h3>
+              {overviewLoading && (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#2E7D32]"></div>
+              )}
+            </div>
+            {(overviewDateFilter.fromDate || overviewDateFilter.toDate) && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-[#2E7D32]/10 dark:bg-primary-500/10 rounded-lg">
+                <Calendar className="w-4 h-4 text-[#2E7D32] dark:text-primary-400" />
+                <span className="text-sm text-[#2E7D32] dark:text-primary-400">
+                  {overviewDateFilter.fromDate || 'Start'} → {overviewDateFilter.toDate || 'Now'}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Date Selection Buttons */}
+          <div className="flex flex-wrap gap-2">
+            {overviewQuickDateRanges.map((range) => (
+              <motion.button
+                key={range.value}
+                onClick={() => handleOverviewQuickDate(range.value)}
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                className={`
+                  group relative px-4 py-2.5 text-sm font-medium rounded-xl
+                  transition-all duration-300 overflow-hidden
+                  ${activeOverviewQuickDate === range.value
+                    ? 'bg-gradient-to-r from-[#2E7D32] to-[#4CAF50] text-white shadow-lg shadow-green-500/30'
+                    : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:border-[#2E7D32]/30 dark:hover:border-green-500/30 hover:shadow-md'
+                  }
+                `}
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  <span>{range.icon}</span>
+                  <span>{range.label}</span>
+                </span>
+                {activeOverviewQuickDate !== range.value && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#2E7D32]/10 to-[#4CAF50]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                )}
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200 dark:border-white/10" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-white dark:bg-gray-800 px-4 text-sm text-gray-500 dark:text-gray-400">
+                or select custom date range
+              </span>
+            </div>
+          </div>
+
+          {/* Custom Date Range Inputs */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="relative">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">From Date</label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="date"
+                  value={overviewDateFilter.fromDate || ''}
+                  onChange={(e) => {
+                    setActiveOverviewQuickDate('custom');
+                    setOverviewDateFilter(prev => ({ ...prev, fromDate: e.target.value }));
+                  }}
+                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10
+                           text-gray-900 dark:text-white rounded-xl text-sm
+                           focus:outline-none focus:ring-2 focus:ring-[#2E7D32]/30 focus:border-[#2E7D32]
+                           transition-all duration-200"
+                />
+              </div>
+            </div>
+            <div className="relative">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">To Date</label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="date"
+                  value={overviewDateFilter.toDate || ''}
+                  onChange={(e) => {
+                    setActiveOverviewQuickDate('custom');
+                    setOverviewDateFilter(prev => ({ ...prev, toDate: e.target.value }));
+                  }}
+                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10
+                           text-gray-900 dark:text-white rounded-xl text-sm
+                           focus:outline-none focus:ring-2 focus:ring-[#2E7D32]/30 focus:border-[#2E7D32]
+                           transition-all duration-200"
+                />
+              </div>
+            </div>
+            <div className="flex items-end">
+              <motion.button
+                onClick={() => {
+                  setActiveOverviewQuickDate('all');
+                  setOverviewDateFilter({ fromDate: '', toDate: '' });
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full px-4 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300
+                         border border-gray-200 dark:border-white/10 rounded-xl text-sm font-medium
+                         hover:bg-gray-200 dark:hover:bg-white/10 transition-all duration-200"
+              >
+                Clear Filters
+              </motion.button>
+            </div>
+          </div>
+        </div>
+      </GlassCard>
+
       {/* System Summary Cards */}
-      {systemData && systemData.summary && (
+      {filteredSystemData && filteredSystemData.summary && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {/* Paddy Stock Card - Green */}
           <motion.div
@@ -663,7 +864,7 @@ const Reports = () => {
               <div>
                 <p className="text-xs text-gray-600 dark:text-gray-400">Total Paddy Stock</p>
                 <p className="text-xl md:text-2xl font-bold text-green-700 dark:text-green-400">
-                  {(systemData.summary?.totalPaddyStock || 0).toLocaleString()} kg
+                  {(filteredSystemData.summary?.totalPaddyStock || 0).toLocaleString()} kg
                 </p>
               </div>
             </div>
@@ -684,7 +885,7 @@ const Reports = () => {
               <div>
                 <p className="text-xs text-gray-600 dark:text-gray-400">Total Rice Stock</p>
                 <p className="text-xl md:text-2xl font-bold text-purple-700 dark:text-purple-400">
-                  {(systemData.summary?.totalRiceStock || 0).toLocaleString()} kg
+                  {(filteredSystemData.summary?.totalRiceStock || 0).toLocaleString()} kg
                 </p>
               </div>
             </div>
@@ -705,7 +906,7 @@ const Reports = () => {
               <div>
                 <p className="text-xs text-gray-600 dark:text-gray-400">Paddy Sales Revenue</p>
                 <p className="text-xl md:text-2xl font-bold text-orange-700 dark:text-orange-400">
-                  Rs. {(systemData.summary?.totalPaddySales || 0).toLocaleString()}
+                  Rs. {(filteredSystemData.summary?.totalPaddySales || 0).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -726,7 +927,7 @@ const Reports = () => {
               <div>
                 <p className="text-xs text-gray-600 dark:text-gray-400">Rice Sales Revenue</p>
                 <p className="text-xl md:text-2xl font-bold text-blue-700 dark:text-blue-400">
-                  Rs. {(systemData.summary?.totalRiceSales || 0).toLocaleString()}
+                  Rs. {(filteredSystemData.summary?.totalRiceSales || 0).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -735,7 +936,7 @@ const Reports = () => {
       )}
 
       {/* Additional Stock Info Cards */}
-      {systemData && systemData.summary && (
+      {filteredSystemData && filteredSystemData.summary && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {/* Broken Rice - Green Box */}
           <motion.div
@@ -746,7 +947,7 @@ const Reports = () => {
             <div className="flex justify-between items-center">
               <span className="text-[#2E7D32] dark:text-green-400 font-medium">Total Broken Rice:</span>
               <span className="text-[#2E7D32] dark:text-green-400 text-xl font-bold">
-                {(systemData.summary?.totalBrokenRice || 0).toLocaleString()} kg
+                {(filteredSystemData.summary?.totalBrokenRice || 0).toLocaleString()} kg
               </span>
             </div>
           </motion.div>
@@ -761,7 +962,7 @@ const Reports = () => {
             <div className="flex justify-between items-center">
               <span className="text-[#2E7D32] dark:text-green-400 font-medium">Total Polish Rice:</span>
               <span className="text-[#2E7D32] dark:text-green-400 text-xl font-bold">
-                {(systemData.summary?.totalPolishRice || 0).toLocaleString()} kg
+                {(filteredSystemData.summary?.totalPolishRice || 0).toLocaleString()} kg
               </span>
             </div>
           </motion.div>
@@ -776,7 +977,7 @@ const Reports = () => {
             <div className="flex justify-between items-center">
               <span className="text-[#2E7D32] dark:text-green-400 font-medium">Total Revenue:</span>
               <span className="text-[#2E7D32] dark:text-green-400 text-xl font-bold">
-                Rs. {((systemData.summary?.totalPaddySales || 0) + (systemData.summary?.totalRiceSales || 0)).toLocaleString()}
+                Rs. {((filteredSystemData.summary?.totalPaddySales || 0) + (filteredSystemData.summary?.totalRiceSales || 0)).toLocaleString()}
               </span>
             </div>
           </motion.div>
@@ -784,16 +985,16 @@ const Reports = () => {
       )}
 
       {/* System Overview Charts */}
-      {systemData && (
+      {filteredSystemData && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           <GlassCard>
             <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4">Stock Overview</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={[
-                { name: 'Paddy Stock', value: systemData.summary?.totalPaddyStock || 0, fill: '#2E7D32' },
-                { name: 'Rice Stock', value: systemData.summary?.totalRiceStock || 0, fill: '#8B5CF6' },
-                { name: 'Broken Rice', value: systemData.summary?.totalBrokenRice || 0, fill: '#F97316' },
-                { name: 'Polish Rice', value: systemData.summary?.totalPolishRice || 0, fill: '#3B82F6' }
+                { name: 'Paddy Stock', value: filteredSystemData.summary?.totalPaddyStock || 0, fill: '#2E7D32' },
+                { name: 'Rice Stock', value: filteredSystemData.summary?.totalRiceStock || 0, fill: '#8B5CF6' },
+                { name: 'Broken Rice', value: filteredSystemData.summary?.totalBrokenRice || 0, fill: '#F97316' },
+                { name: 'Polish Rice', value: filteredSystemData.summary?.totalPolishRice || 0, fill: '#3B82F6' }
               ]}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(46, 125, 50, 0.2)" />
                 <XAxis dataKey="name" stroke="#666" tick={{ fontSize: 12 }} />
@@ -826,8 +1027,8 @@ const Reports = () => {
               <PieChart>
                 <Pie
                   data={[
-                    { name: 'Paddy Sales', value: systemData.summary?.totalPaddySales || 0 },
-                    { name: 'Rice Sales', value: systemData.summary?.totalRiceSales || 0 }
+                    { name: 'Paddy Sales', value: filteredSystemData.summary?.totalPaddySales || 0 },
+                    { name: 'Rice Sales', value: filteredSystemData.summary?.totalRiceSales || 0 }
                   ]}
                   cx="50%"
                   cy="50%"
@@ -856,10 +1057,10 @@ const Reports = () => {
       )}
 
       {/* Inventory by Type Charts */}
-      {systemData && (systemData.paddyData || systemData.riceData) && (
+      {systemData && (filteredSystemData.paddyData || filteredSystemData.riceData) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {/* Paddy Stock by Type */}
-          {systemData.paddyData && Object.keys(systemData.paddyData).length > 0 && (
+          {filteredSystemData.paddyData && Object.keys(filteredSystemData.paddyData).length > 0 && (
             <GlassCard>
               <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 <span className="flex items-center gap-2">
@@ -868,7 +1069,7 @@ const Reports = () => {
                 </span>
               </h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={Object.entries(systemData.paddyData).map(([type, data]) => ({
+                <BarChart data={Object.entries(filteredSystemData.paddyData).map(([type, data]) => ({
                   name: type,
                   stock: data.totalStock || 0,
                   sales: data.totalSales || 0,
@@ -897,7 +1098,7 @@ const Reports = () => {
           )}
 
           {/* Rice Stock by Type */}
-          {systemData.riceData && Object.keys(systemData.riceData).length > 0 && (
+          {filteredSystemData.riceData && Object.keys(filteredSystemData.riceData).length > 0 && (
             <GlassCard>
               <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 <span className="flex items-center gap-2">
@@ -906,7 +1107,7 @@ const Reports = () => {
                 </span>
               </h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={Object.entries(systemData.riceData).map(([type, data]) => ({
+                <BarChart data={Object.entries(filteredSystemData.riceData).map(([type, data]) => ({
                   name: type,
                   stock: data.totalStock || 0,
                   broken: data.totalBrokenRice || 0,
@@ -936,10 +1137,10 @@ const Reports = () => {
       )}
 
       {/* Stock vs Sales Comparison Charts */}
-      {systemData && (systemData.paddyData || systemData.riceData) && (
+      {systemData && (filteredSystemData.paddyData || filteredSystemData.riceData) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {/* Paddy Stock vs Sales Pie Chart */}
-          {systemData.paddyData && Object.keys(systemData.paddyData).length > 0 && (
+          {filteredSystemData.paddyData && Object.keys(filteredSystemData.paddyData).length > 0 && (
             <GlassCard>
               <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 <span className="flex items-center gap-2">
@@ -950,7 +1151,7 @@ const Reports = () => {
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={Object.entries(systemData.paddyData).map(([type, data]) => ({
+                    data={Object.entries(filteredSystemData.paddyData).map(([type, data]) => ({
                       name: type,
                       value: data.totalStock || 0
                     }))}
@@ -963,7 +1164,7 @@ const Reports = () => {
                     dataKey="value"
                     label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                   >
-                    {Object.keys(systemData.paddyData).map((_, index) => (
+                    {Object.keys(filteredSystemData.paddyData).map((_, index) => (
                       <Cell key={`cell-${index}`} fill={[COLORS.green, COLORS.greenLight, COLORS.orange, COLORS.blue][index % 4]} />
                     ))}
                   </Pie>
@@ -982,7 +1183,7 @@ const Reports = () => {
           )}
 
           {/* Rice Stock Distribution Pie Chart */}
-          {systemData.riceData && Object.keys(systemData.riceData).length > 0 && (
+          {filteredSystemData.riceData && Object.keys(filteredSystemData.riceData).length > 0 && (
             <GlassCard>
               <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 <span className="flex items-center gap-2">
@@ -993,7 +1194,7 @@ const Reports = () => {
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={Object.entries(systemData.riceData).map(([type, data]) => ({
+                    data={Object.entries(filteredSystemData.riceData).map(([type, data]) => ({
                       name: type,
                       value: data.totalStock || 0
                     }))}
@@ -1006,7 +1207,7 @@ const Reports = () => {
                     dataKey="value"
                     label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                   >
-                    {Object.keys(systemData.riceData).map((_, index) => (
+                    {Object.keys(filteredSystemData.riceData).map((_, index) => (
                       <Cell key={`cell-${index}`} fill={[COLORS.purple, COLORS.purpleLight, COLORS.blue, COLORS.orange][index % 4]} />
                     ))}
                   </Pie>
@@ -1027,7 +1228,7 @@ const Reports = () => {
       )}
 
       {/* Revenue Analysis Charts */}
-      {systemData && (systemData.paddyData || systemData.riceData) && (
+      {systemData && (filteredSystemData.paddyData || filteredSystemData.riceData) && (
         <div className="grid grid-cols-1 gap-4 md:gap-6">
           <GlassCard>
             <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4">
@@ -1038,13 +1239,13 @@ const Reports = () => {
             </h3>
             <ResponsiveContainer width="100%" height={350}>
               <ComposedChart data={[
-                ...Object.entries(systemData.paddyData || {}).map(([type, data]) => ({
+                ...Object.entries(filteredSystemData.paddyData || {}).map(([type, data]) => ({
                   name: `Paddy: ${type}`,
                   revenue: data.totalRevenue || 0,
                   quantity: data.totalSales || 0,
                   category: 'Paddy'
                 })),
-                ...Object.entries(systemData.riceData || {}).map(([type, data]) => ({
+                ...Object.entries(filteredSystemData.riceData || {}).map(([type, data]) => ({
                   name: `Rice: ${type}`,
                   revenue: data.totalRevenue || 0,
                   quantity: data.totalSales || 0,
@@ -1076,7 +1277,7 @@ const Reports = () => {
       )}
 
       {/* Inventory Overview - Full Width Area Chart */}
-      {systemData && systemData.summary && (
+      {systemData && filteredSystemData.summary && (
         <GlassCard>
           <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4">
             <span className="flex items-center gap-2">
@@ -1087,27 +1288,27 @@ const Reports = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-200 dark:border-green-500/30 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-600 dark:text-gray-400">Paddy Types</p>
-              <p className="text-2xl font-bold text-green-700 dark:text-green-400">{Object.keys(systemData.paddyData || {}).length}</p>
+              <p className="text-2xl font-bold text-green-700 dark:text-green-400">{Object.keys(filteredSystemData.paddyData || {}).length}</p>
             </div>
             <div className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-500/10 dark:to-violet-500/10 border border-purple-200 dark:border-purple-500/30 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-600 dark:text-gray-400">Rice Types</p>
-              <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{Object.keys(systemData.riceData || {}).length}</p>
+              <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{Object.keys(filteredSystemData.riceData || {}).length}</p>
             </div>
             <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-500/10 dark:to-amber-500/10 border border-orange-200 dark:border-orange-500/30 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-600 dark:text-gray-400">Threshing Records</p>
-              <p className="text-2xl font-bold text-orange-700 dark:text-orange-400">{(systemData.threshingData || []).length}</p>
+              <p className="text-2xl font-bold text-orange-700 dark:text-orange-400">{(filteredSystemData.threshingData || []).length}</p>
             </div>
             <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-500/10 dark:to-cyan-500/10 border border-blue-200 dark:border-blue-500/30 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-600 dark:text-gray-400">Total Revenue</p>
-              <p className="text-lg md:text-2xl font-bold text-blue-700 dark:text-blue-400">Rs. {((systemData.summary?.totalPaddySales || 0) + (systemData.summary?.totalRiceSales || 0)).toLocaleString()}</p>
+              <p className="text-lg md:text-2xl font-bold text-blue-700 dark:text-blue-400">Rs. {((filteredSystemData.summary?.totalPaddySales || 0) + (filteredSystemData.summary?.totalRiceSales || 0)).toLocaleString()}</p>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={[
-              { name: 'Paddy Stock', value: systemData.summary?.totalPaddyStock || 0, fill: COLORS.green },
-              { name: 'Rice Stock', value: systemData.summary?.totalRiceStock || 0, fill: COLORS.purple },
-              { name: 'Broken Rice', value: systemData.summary?.totalBrokenRice || 0, fill: COLORS.orange },
-              { name: 'Polish Rice', value: systemData.summary?.totalPolishRice || 0, fill: COLORS.blue }
+              { name: 'Paddy Stock', value: filteredSystemData.summary?.totalPaddyStock || 0, fill: COLORS.green },
+              { name: 'Rice Stock', value: filteredSystemData.summary?.totalRiceStock || 0, fill: COLORS.purple },
+              { name: 'Broken Rice', value: filteredSystemData.summary?.totalBrokenRice || 0, fill: COLORS.orange },
+              { name: 'Polish Rice', value: filteredSystemData.summary?.totalPolishRice || 0, fill: COLORS.blue }
             ]}>
               <defs>
                 <linearGradient id="colorGreen" x1="0" y1="0" x2="0" y2="1">
@@ -1133,7 +1334,7 @@ const Reports = () => {
       )}
 
       {/* Threshing Data Table */}
-      {systemData && systemData.threshingData && systemData.threshingData.length > 0 && (
+      {systemData && filteredSystemData.threshingData && filteredSystemData.threshingData.length > 0 && (
         <GlassCard>
           <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-4">
             Recent Threshing Operations
@@ -1152,7 +1353,7 @@ const Reports = () => {
                 </tr>
               </thead>
               <tbody>
-                {systemData.threshingData.slice(0, 10).map((item, index) => (
+                {filteredSystemData.threshingData.slice(0, 10).map((item, index) => (
                   <tr key={index} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5">
                     <td className="py-3 px-4 text-gray-900 dark:text-white">
                       {item.date ? new Date(item.date).toLocaleDateString() : '-'}
