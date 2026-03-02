@@ -489,6 +489,8 @@ const Reports = () => {
             width: 80px;
             height: 80px;
             object-fit: contain;
+            margin-top: -26px;
+            margin-right: -2.2px;
           }
           .company-info {
             display: flex;
