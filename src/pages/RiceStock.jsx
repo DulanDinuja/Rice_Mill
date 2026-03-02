@@ -129,9 +129,9 @@ const RiceStock = () => {
         const transactionType = stockToDelete.transactionType;
         if (transactionType === 'Sale') {
           await stockService.deleteRiceSale(stockToDelete.id, reason);
-        } else if (transactionType === 'Threshing') {
-          await stockService.deletePaddyThreshing(stockToDelete.id, reason);
         } else {
+          // Both 'Add Stock' and 'Threshing' entries are stored in /rice/addstock
+          // so we use deleteRiceStock for both
           await stockService.deleteRiceStock(stockToDelete.id, reason);
         }
         loadStocks();

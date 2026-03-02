@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Modal from '../ui/Modal';
 import NeonButton from '../ui/NeonButton';
-import { Wheat } from 'lucide-react';
+import { Wheat, AlertCircle } from 'lucide-react';
 import { PADDY_TYPES, RICE_TYPES } from '../../utils/constants';
 
 const ThreshingModal = ({ isOpen, onClose, onThreshingComplete }) => {
@@ -18,6 +18,26 @@ const ThreshingModal = ({ isOpen, onClose, onThreshingComplete }) => {
     threshingDate: new Date().toISOString().split('T')[0],
     notes: ''
   });
+  const [validationError, setValidationError] = useState('');
+
+  // Calculate total rice output
+  const getTotalRiceOutput = () => {
+    const rice = parseFloat(formData.riceQuantity) || 0;
+    const broken = parseFloat(formData.brokenRiceQuantity) || 0;
+    const polish = parseFloat(formData.polishRiceQuantity) || 0;
+    return rice + broken + polish;
+  };
+
+  // Validate quantities
+  const validateQuantities = () => {
+    const paddyQty = parseFloat(formData.paddyQuantity) || 0;
+    const totalRiceOutput = getTotalRiceOutput();
+
+    if (paddyQty > 0 && totalRiceOutput > paddyQty) {
+      return `Total rice output (${totalRiceOutput} kg) cannot exceed paddy input (${paddyQty} kg)`;
+    }
+    return '';
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -32,10 +52,21 @@ const ThreshingModal = ({ isOpen, onClose, onThreshingComplete }) => {
 
       return updated;
     });
+
+    // Clear validation error when user makes changes
+    setValidationError('');
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Validate: Paddy Quantity >= Rice + Broken Rice + Polish Rice
+    const error = validateQuantities();
+    if (error) {
+      setValidationError(error);
+      return;
+    }
+
     onThreshingComplete(formData);
     setFormData({
       paddyType: '',
@@ -50,6 +81,7 @@ const ThreshingModal = ({ isOpen, onClose, onThreshingComplete }) => {
       threshingDate: new Date().toISOString().split('T')[0],
       notes: ''
     });
+    setValidationError('');
     onClose();
   };
 
@@ -254,8 +286,8 @@ const ThreshingModal = ({ isOpen, onClose, onThreshingComplete }) => {
 
         {/* Summary Box */}
         {formData.paddyQuantity && (
-          <div className="bg-[#2E7D32]/10 border border-[#2E7D32]/20 dark:bg-primary-500/10 dark:border-primary-500/20 rounded-lg p-3 md:p-4">
-            <h4 className="text-sm font-semibold text-[#2E7D32] dark:text-primary-400 mb-2">Threshing Summary</h4>
+          <div className={`${validateQuantities() ? 'bg-red-500/10 border-red-500/20' : 'bg-[#2E7D32]/10 border-[#2E7D32]/20 dark:bg-primary-500/10 dark:border-primary-500/20'} border rounded-lg p-3 md:p-4`}>
+            <h4 className={`text-sm font-semibold ${validateQuantities() ? 'text-red-500' : 'text-[#2E7D32] dark:text-primary-400'} mb-2`}>Threshing Summary</h4>
             <div className="space-y-1 text-xs md:text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-400">Paddy Input:</span>
@@ -279,7 +311,27 @@ const ThreshingModal = ({ isOpen, onClose, onThreshingComplete }) => {
                   <span className="text-gray-900 dark:text-white font-medium">{formData.polishRiceQuantity} kg</span>
                 </div>
               )}
+              <div className="border-t border-gray-200 dark:border-white/10 pt-2 mt-2">
+                <div className="flex justify-between">
+                  <span className={`font-medium ${validateQuantities() ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'}`}>Total Rice Output:</span>
+                  <span className={`font-bold ${validateQuantities() ? 'text-red-500' : 'text-[#2E7D32] dark:text-primary-400'}`}>{getTotalRiceOutput()} kg</span>
+                </div>
+              </div>
+              {validateQuantities() && (
+                <div className="flex items-center gap-2 mt-2 text-red-500">
+                  <AlertCircle size={16} />
+                  <span className="text-xs">{validateQuantities()}</span>
+                </div>
+              )}
             </div>
+          </div>
+        )}
+
+        {/* Validation Error Message */}
+        {validationError && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 flex items-center gap-2">
+            <AlertCircle className="text-red-500" size={20} />
+            <span className="text-red-500 text-sm">{validationError}</span>
           </div>
         )}
 
@@ -288,7 +340,11 @@ const ThreshingModal = ({ isOpen, onClose, onThreshingComplete }) => {
           <NeonButton type="button" variant="outline" onClick={onClose} className="w-full sm:w-auto">
             Cancel
           </NeonButton>
-          <NeonButton type="submit" className="w-full sm:w-auto">
+          <NeonButton
+            type="submit"
+            className="w-full sm:w-auto"
+            disabled={!!validateQuantities()}
+          >
             <Wheat size={20} />
             Process Threshing
           </NeonButton>
