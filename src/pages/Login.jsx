@@ -27,7 +27,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   // Admin email where verification codes are sent
-  const ADMIN_EMAIL = 'dulandinuja712@gmail.com';
+  const ADMIN_EMAIL = 'sewmininilakshi919@gmail.com';
 
   const startResendTimer = () => {
     setResendTimer(120); // 2 minutes
