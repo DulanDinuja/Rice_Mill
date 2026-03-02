@@ -230,13 +230,119 @@ export const reportsService = {
     if (USE_MOCK) {
       return { data: [] };
     }
-    return axiosInstance.get('/reports/customers');
+    try {
+      // Fetch customers from paddy and rice sales
+      const [paddySaleRes, riceSaleRes] = await Promise.all([
+        axiosInstance.get('/paddy/paddysale'),
+        axiosInstance.get('/rice/ricesale')
+      ]);
+
+      const customersMap = new Map();
+
+      // Extract customers from paddy sales
+      (paddySaleRes.data || []).forEach(sale => {
+        const name = sale.customerName || sale.customer;
+        const id = sale.customerId || sale.nic || '';
+        const mobile = sale.mobileNumber || '';
+        if (name && name !== 'N/A') {
+          const key = `${name}-${id}`;
+          if (!customersMap.has(key)) {
+            customersMap.set(key, { name, id, mobile, type: 'customer' });
+          }
+        }
+      });
+
+      // Extract customers from rice sales
+      (riceSaleRes.data || []).forEach(sale => {
+        const name = sale.customerName || sale.customer;
+        const id = sale.customerId || sale.nic || '';
+        const mobile = sale.mobileNumber || '';
+        if (name && name !== 'N/A') {
+          const key = `${name}-${id}`;
+          if (!customersMap.has(key)) {
+            customersMap.set(key, { name, id, mobile, type: 'customer' });
+          }
+        }
+      });
+
+      return { data: Array.from(customersMap.values()) };
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+      return { data: [] };
+    }
   },
 
   getSuppliers: async () => {
     if (USE_MOCK) {
       return { data: [] };
     }
-    return axiosInstance.get('/reports/suppliers');
+    try {
+      // Fetch suppliers from paddy and rice stock additions
+      const [paddyStockRes, riceStockRes, paddySaleRes, riceSaleRes] = await Promise.all([
+        axiosInstance.get('/paddy/addstock'),
+        axiosInstance.get('/rice/addstock'),
+        axiosInstance.get('/paddy/paddysale'),
+        axiosInstance.get('/rice/ricesale')
+      ]);
+
+      const suppliersMap = new Map();
+
+      // Extract suppliers from paddy stock
+      (paddyStockRes.data || []).forEach(stock => {
+        const name = stock.supplierName || stock.supplier || stock.customerName || '';
+        const id = stock.supplierId || stock.customerId || stock.nic || '';
+        const mobile = stock.mobileNumber || '';
+        // Only exclude 'Threshing' and empty names
+        if (name && name.trim() !== '' && name.toLowerCase() !== 'threshing' && name.toLowerCase() !== 'n/a') {
+          const key = `${name.trim()}-${id}`;
+          if (!suppliersMap.has(key)) {
+            suppliersMap.set(key, { name: name.trim(), id, mobile, type: 'supplier' });
+          }
+        }
+      });
+
+      // Extract suppliers from rice stock (excluding threshing entries)
+      (riceStockRes.data || []).forEach(stock => {
+        const name = stock.supplierName || stock.supplier || stock.customerName || '';
+        const id = stock.supplierId || stock.customerId || stock.nic || '';
+        const mobile = stock.mobileNumber || '';
+        if (name && name.trim() !== '' && name.toLowerCase() !== 'threshing' && name.toLowerCase() !== 'n/a') {
+          const key = `${name.trim()}-${id}`;
+          if (!suppliersMap.has(key)) {
+            suppliersMap.set(key, { name: name.trim(), id, mobile, type: 'supplier' });
+          }
+        }
+      });
+
+      // Also include customers from sales (for sale reports)
+      (paddySaleRes.data || []).forEach(sale => {
+        const name = sale.customerName || sale.customer || '';
+        const id = sale.customerId || sale.nic || '';
+        const mobile = sale.mobileNumber || '';
+        if (name && name.trim() !== '' && name.toLowerCase() !== 'n/a') {
+          const key = `${name.trim()}-${id}`;
+          if (!suppliersMap.has(key)) {
+            suppliersMap.set(key, { name: name.trim(), id, mobile, type: 'customer' });
+          }
+        }
+      });
+
+      (riceSaleRes.data || []).forEach(sale => {
+        const name = sale.customerName || sale.customer || '';
+        const id = sale.customerId || sale.nic || '';
+        const mobile = sale.mobileNumber || '';
+        if (name && name.trim() !== '' && name.toLowerCase() !== 'n/a') {
+          const key = `${name.trim()}-${id}`;
+          if (!suppliersMap.has(key)) {
+            suppliersMap.set(key, { name: name.trim(), id, mobile, type: 'customer' });
+          }
+        }
+      });
+
+      return { data: Array.from(suppliersMap.values()) };
+    } catch (error) {
+      console.error('Error fetching suppliers:', error);
+      return { data: [] };
+    }
   }
 };

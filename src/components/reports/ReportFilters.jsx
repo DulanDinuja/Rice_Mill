@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Download, Printer, FileText, ChevronDown, Sparkles, RotateCcw, Search, Wheat, Box } from 'lucide-react';
+import { Calendar, Download, Printer, FileText, ChevronDown, Sparkles, RotateCcw, Search, Wheat, Box, X, User } from 'lucide-react';
 import { REPORT_TYPES } from '../../services/reportsService';
 import { PADDY_TYPES, RICE_TYPES } from '../../utils/constants';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const ReportFilters = ({
   filters,
@@ -16,6 +16,58 @@ const ReportFilters = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [activeQuickDate, setActiveQuickDate] = useState(null);
+
+  // Supplier/Customer searchable dropdown state
+  const [supplierSearchTerm, setSupplierSearchTerm] = useState('');
+  const [isSupplierDropdownOpen, setIsSupplierDropdownOpen] = useState(false);
+  const supplierDropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (supplierDropdownRef.current && !supplierDropdownRef.current.contains(event.target)) {
+        setIsSupplierDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+
+  // Filter suppliers based on search term (search by name or NIC/ID)
+  const filteredSuppliers = Array.isArray(suppliers)
+    ? suppliers.filter(supplier => {
+        if (!supplierSearchTerm) return true;
+        const searchLower = supplierSearchTerm.toLowerCase();
+        // Handle both string and object formats
+        if (typeof supplier === 'string') {
+          return supplier.toLowerCase().includes(searchLower);
+        }
+        // If supplier is an object with name and id/nic
+        const name = (supplier.name || supplier.customerName || supplier.supplierName || '').toLowerCase();
+        const id = (supplier.id || supplier.nic || supplier.customerId || supplier.supplierId || '').toString().toLowerCase();
+        const mobile = (supplier.mobile || supplier.mobileNumber || '').toString().toLowerCase();
+        return name.includes(searchLower) || id.includes(searchLower) || mobile.includes(searchLower);
+      })
+    : [];
+
+  const getSupplierDisplayValue = (supplier) => {
+    if (!supplier) return '';
+    if (typeof supplier === 'string') return supplier;
+    return supplier.name || supplier.customerName || supplier.supplierName || '';
+  };
+
+  const getSupplierIdValue = (supplier) => {
+    if (!supplier) return '';
+    if (typeof supplier === 'string') return '';
+    return supplier.id || supplier.nic || supplier.customerId || supplier.supplierId || '';
+  };
+
+  const getSupplierMobile = (supplier) => {
+    if (!supplier) return '';
+    if (typeof supplier === 'string') return '';
+    return supplier.mobile || supplier.mobileNumber || '';
+  };
 
   const reportTypeOptions = [
     { value: '', label: 'Select Report Type', disabled: true, icon: null },
@@ -105,11 +157,13 @@ const ReportFilters = ({
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden"
+      className="relative"
+      style={{ overflow: 'visible' }}
     >
       {/* Main Container with Gradient Border */}
       <div className="relative bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900
-                    rounded-3xl shadow-2xl border border-gray-200/50 dark:border-white/10">
+                    rounded-3xl shadow-2xl border border-gray-200/50 dark:border-white/10"
+           style={{ overflow: 'visible' }}>
 
         {/* Decorative Background Elements */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-green-500/5 to-emerald-500/10 rounded-full blur-3xl" />
@@ -183,9 +237,9 @@ const ReportFilters = ({
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="overflow-hidden"
+              style={{ overflow: 'visible' }}
             >
-              <div className="relative z-10 p-4 md:p-6 space-y-6">
+              <div className="relative z-10 p-4 md:p-6 space-y-6" style={{ overflow: 'visible' }}>
 
                 {/* Quick Date Range Section */}
                 <div className="space-y-3">
@@ -316,7 +370,7 @@ const ReportFilters = ({
                 </div>
 
                 {/* Additional Filters Row */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" style={{ overflow: 'visible' }}>
 
                   {/* Warehouse Filter */}
                   <motion.div whileHover={{ scale: 1.02 }} className="space-y-2">
@@ -404,40 +458,133 @@ const ReportFilters = ({
                     </motion.div>
                   )}
 
-                  {/* Supplier/Customer Filter */}
+                  {/* Supplier/Customer Filter - Searchable Dropdown */}
                   {filters.reportType && filters.reportType !== REPORT_TYPES.PADDY_THRESHING && (
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       whileHover={{ scale: 1.02 }}
-                      className="space-y-2"
+                      className="space-y-2 relative"
+                      ref={supplierDropdownRef}
                     >
                       <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                        <Search className="w-4 h-4 text-cyan-500" />
+                        <User className="w-4 h-4 text-cyan-500" />
                         {(filters.reportType === REPORT_TYPES.PADDY_SALE || filters.reportType === REPORT_TYPES.RICE_SALE)
                           ? 'Customer'
                           : 'Supplier'}
                       </label>
-                      <select
-                        value={filters.supplier || ''}
-                        onChange={(e) => onFilterChange({ ...filters, supplier: e.target.value })}
-                        className="w-full px-4 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10
-                                 text-gray-900 dark:text-white rounded-xl
-                                 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 dark:focus:ring-cyan-500/30
-                                 focus:border-cyan-500 dark:focus:border-cyan-500
-                                 transition-all duration-200 hover:border-cyan-300 dark:hover:border-cyan-500/30"
-                      >
-                        <option value="" className="bg-white dark:bg-gray-800">
-                          {(filters.reportType === REPORT_TYPES.PADDY_SALE || filters.reportType === REPORT_TYPES.RICE_SALE)
-                            ? 'All Customers'
-                            : 'All Suppliers'}
-                        </option>
-                        {Array.isArray(suppliers) && suppliers.map((supplier, index) => (
-                          <option key={`supplier-${index}`} value={supplier} className="bg-white dark:bg-gray-800">
-                            {supplier}
-                          </option>
-                        ))}
-                      </select>
+
+                      {/* Search Input */}
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+                        <input
+                          type="text"
+                          placeholder={
+                            (filters.reportType === REPORT_TYPES.PADDY_SALE || filters.reportType === REPORT_TYPES.RICE_SALE)
+                              ? 'Search customer by name or NIC...'
+                              : 'Search supplier by name or NIC...'
+                          }
+                          value={isSupplierDropdownOpen ? supplierSearchTerm : (filters.supplier || '')}
+                          onChange={(e) => {
+                            setSupplierSearchTerm(e.target.value);
+                            setIsSupplierDropdownOpen(true);
+                          }}
+                          onFocus={() => setIsSupplierDropdownOpen(true)}
+                          className="w-full pl-10 pr-10 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10
+                                   text-gray-900 dark:text-white rounded-xl text-sm
+                                   focus:outline-none focus:ring-2 focus:ring-cyan-500/30 dark:focus:ring-cyan-500/30
+                                   focus:border-cyan-500 dark:focus:border-cyan-500
+                                   transition-all duration-200 hover:border-cyan-300 dark:hover:border-cyan-500/30"
+                        />
+                        {filters.supplier ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onFilterChange({ ...filters, supplier: '' });
+                              setSupplierSearchTerm('');
+                            }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full z-10"
+                          >
+                            <X className="w-4 h-4 text-gray-400" />
+                          </button>
+                        ) : (
+                          <ChevronDown
+                            className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform cursor-pointer ${isSupplierDropdownOpen ? 'rotate-180' : ''}`}
+                            onClick={() => setIsSupplierDropdownOpen(!isSupplierDropdownOpen)}
+                          />
+                        )}
+
+                        {/* Dropdown List */}
+                        {isSupplierDropdownOpen && (
+                          <div
+                            className="absolute top-full left-0 right-0 z-[99999] mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10
+                                     rounded-xl shadow-2xl max-h-64 overflow-y-auto"
+                          >
+                            {/* All Option */}
+                            <div
+                              onClick={() => {
+                                onFilterChange({ ...filters, supplier: '' });
+                                setSupplierSearchTerm('');
+                                setIsSupplierDropdownOpen(false);
+                              }}
+                              className="px-4 py-3 cursor-pointer hover:bg-cyan-50 dark:hover:bg-cyan-500/10
+                                       text-gray-700 dark:text-gray-300 text-sm border-b border-gray-100 dark:border-white/5
+                                       flex items-center justify-between"
+                            >
+                              <span>
+                                {(filters.reportType === REPORT_TYPES.PADDY_SALE || filters.reportType === REPORT_TYPES.RICE_SALE)
+                                  ? '🔄 All Customers'
+                                  : '🔄 All Suppliers'}
+                              </span>
+                              <span className="text-xs text-gray-400">({filteredSuppliers.length} found)</span>
+                            </div>
+
+                            {/* Supplier List */}
+                            {filteredSuppliers.length > 0 ? (
+                              filteredSuppliers.map((supplier, index) => {
+                                const displayName = getSupplierDisplayValue(supplier);
+                                const supplierId = getSupplierIdValue(supplier);
+                                const supplierMobile = getSupplierMobile(supplier);
+                                const isSelected = filters.supplier === displayName;
+
+                                return (
+                                  <div
+                                    key={`supplier-item-${index}`}
+                                    onClick={() => {
+                                      onFilterChange({ ...filters, supplier: displayName });
+                                      setSupplierSearchTerm('');
+                                      setIsSupplierDropdownOpen(false);
+                                    }}
+                                    className={`px-4 py-3 cursor-pointer transition-colors text-sm
+                                              ${isSelected 
+                                                ? 'bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400' 
+                                                : 'hover:bg-gray-50 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300'
+                                              }`}
+                                  >
+                                    <div className="flex flex-col gap-1">
+                                      <div className="flex items-center justify-between">
+                                        <span className="font-medium">{displayName}</span>
+                                        {isSelected && <span className="text-cyan-500">✓</span>}
+                                      </div>
+                                      {(supplierId || supplierMobile) && (
+                                        <div className="flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
+                                          {supplierId && <span>NIC: {supplierId}</span>}
+                                          {supplierMobile && <span>📱 {supplierMobile}</span>}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })
+                            ) : (
+                              <div className="px-4 py-6 text-gray-500 dark:text-gray-400 text-sm text-center">
+                                No suppliers found
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </motion.div>
                   )}
                 </div>

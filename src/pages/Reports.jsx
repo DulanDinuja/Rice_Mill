@@ -482,25 +482,34 @@ const Reports = () => {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 15px;
+            gap: 0;
             margin-bottom: 15px;
           }
           .logo {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #2E7D32, #4CAF50);
-            border-radius: 12px;
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+          }
+          .company-info {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-left: -15px;
           }
           .company-name {
-            font-size: 28px;
+            font-size: 36px;
             font-weight: 700;
             color: #2E7D32;
+            font-family: 'Brush Script MT', cursive;
+            font-style: italic;
+            line-height: 1.2;
+          }
+          .company-subtitle {
+            font-size: 11px;
+            color: #4CAF50;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-top: 2px;
           }
           .report-title {
             font-size: 22px;
@@ -640,8 +649,11 @@ const Reports = () => {
       <body>
         <div class="header">
           <div class="logo-section">
-            <div class="logo">RM</div>
-            <span class="company-name">Rice Mill Management</span>
+            <img src="/logo.png" alt="Sameera Rice Mill" class="logo" />
+            <div class="company-info">
+              <span class="company-name">ameera Rice Mill</span>
+              <span class="company-subtitle">INVENTORY MANAGEMENT SYSTEM</span>
+            </div>
           </div>
           <div class="report-title">${reportTypeName}</div>
         </div>
@@ -700,7 +712,7 @@ const Reports = () => {
         </div>
 
         <div class="footer">
-          <div>Rice Mill Management System © ${new Date().getFullYear()}</div>
+          <div>Sameera Rice Mill Management System © ${new Date().getFullYear()}</div>
           <div>Page 1 of 1</div>
         </div>
 
