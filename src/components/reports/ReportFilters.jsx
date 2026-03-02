@@ -163,7 +163,7 @@ const ReportFilters = ({
       {/* Main Container with Gradient Border */}
       <div className="relative bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900
                     rounded-3xl shadow-2xl border border-gray-200/50 dark:border-white/10"
-           style={{ overflow: 'visible' }}>
+           style={{ overflow: 'visible', isolation: 'auto' }}>
 
         {/* Decorative Background Elements */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-green-500/5 to-emerald-500/10 rounded-full blur-3xl" />
@@ -485,11 +485,15 @@ const ReportFilters = ({
                               : 'Search supplier by name or NIC...'
                           }
                           value={isSupplierDropdownOpen ? supplierSearchTerm : (filters.supplier || '')}
+                          readOnly={!isSupplierDropdownOpen && !!filters.supplier}
                           onChange={(e) => {
                             setSupplierSearchTerm(e.target.value);
                             setIsSupplierDropdownOpen(true);
                           }}
-                          onFocus={() => setIsSupplierDropdownOpen(true)}
+                          onFocus={() => {
+                            setSupplierSearchTerm('');
+                            setIsSupplierDropdownOpen(true);
+                          }}
                           className="w-full pl-10 pr-10 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10
                                    text-gray-900 dark:text-white rounded-xl text-sm
                                    focus:outline-none focus:ring-2 focus:ring-cyan-500/30 dark:focus:ring-cyan-500/30
@@ -520,6 +524,7 @@ const ReportFilters = ({
                           <div
                             className="absolute top-full left-0 right-0 z-[99999] mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10
                                      rounded-xl shadow-2xl max-h-64 overflow-y-auto"
+                            style={{ position: 'absolute', zIndex: 99999 }}
                           >
                             {/* All Option */}
                             <div
@@ -594,7 +599,7 @@ const ReportFilters = ({
         </AnimatePresence>
 
         {/* Action Buttons Section - Always Visible */}
-        <div className="relative z-10 p-4 md:p-6 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-800/50 dark:via-gray-900/50 dark:to-gray-800/50
+        <div className="relative z-0 p-4 md:p-6 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-800/50 dark:via-gray-900/50 dark:to-gray-800/50
                       border-t border-gray-200/50 dark:border-white/10 rounded-b-3xl">
           <div className="flex flex-wrap items-center justify-between gap-4">
 
