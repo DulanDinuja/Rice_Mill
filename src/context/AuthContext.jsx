@@ -42,6 +42,11 @@ export const AuthProvider = ({ children }) => {
       confirmPassword: userData.confirmPassword
     });
 
+    // New flow: Backend sends verification code to email
+    if (typeof response.data === 'string' && response.data.startsWith('Verification code sent')) {
+      return { success: true, requiresVerification: true, email: userData.email, message: response.data };
+    }
+
     if (typeof response.data === 'string' && response.data === 'User registered successfully') {
       return { success: true };
     }
@@ -56,6 +61,16 @@ export const AuthProvider = ({ children }) => {
     throw new Error(typeof response.data === 'string' ? response.data : response.data?.message || 'Registration failed');
   };
 
+  const verifyRegistration = async (email, code) => {
+    const response = await axiosInstance.post(`/auth/verify?email=${encodeURIComponent(email)}&code=${encodeURIComponent(code)}`);
+
+    if (typeof response.data === 'string' && response.data === 'Account verified successfully') {
+      return { success: true, message: response.data };
+    }
+
+    throw new Error(typeof response.data === 'string' ? response.data : response.data?.message || 'Verification failed');
+  };
+
   const logout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('access_token');
@@ -63,7 +78,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, verifyRegistration, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
