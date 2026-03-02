@@ -494,22 +494,24 @@ const Reports = () => {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            margin-left: -15px;
+            margin-left: -25px;
           }
           .company-name {
-            font-size: 36px;
+            font-size: 38px;
             font-weight: 700;
             color: #2E7D32;
             font-family: 'Brush Script MT', cursive;
             font-style: italic;
-            line-height: 1.2;
+            line-height: 1.1;
+            margin-top: -5px;
           }
           .company-subtitle {
             font-size: 11px;
             color: #4CAF50;
             font-weight: 600;
             letter-spacing: 2px;
-            margin-top: 2px;
+            margin-top: 0;
+            margin-left: 2px;
           }
           .report-title {
             font-size: 22px;
