@@ -126,7 +126,7 @@ const Reports = () => {
         const [warehousesRes, suppliersRes, systemDataRes] = await Promise.all([
           reportsService.getWarehouses(),
           reportsService.getSuppliers(),
-          reportsService.getAllSystemData()
+          reportsService.getFilteredSystemData('', '') // Use filtered method to get costs
         ]);
         setWarehouses(warehousesRes.data || []);
         setSuppliers(suppliersRes.data || []);
@@ -371,21 +371,31 @@ const Reports = () => {
       totalQuantity = reportData.reduce((sum, item) => sum + (item.quantity || item.paddyQuantity || 0), 0);
       totalAmount = reportData.reduce((sum, item) => sum + (item.totalAmount || item.totalPrice || 0), 0);
     } else if (isPaddyStock) {
-      tableHeaders = ['#', 'Paddy Type', 'Quantity', 'Moisture %', 'Warehouse', 'Supplier', 'User', 'Date'];
-      tableRows = reportData.map((row, index) => `
+      tableHeaders = ['#', 'Paddy Type', 'Quantity', 'Price/kg', 'Total Cost', 'Moisture %', 'Warehouse', 'Supplier', 'User', 'Date'];
+      tableRows = reportData.map((row, index) => {
+        const qty = row.quantity || row.paddyQuantity || 0;
+        const price = row.pricePerKg || 0;
+        const cost = row.totalAmount || row.totalPrice || (qty * price) || 0;
+        return `
         <tr>
           <td>${index + 1}</td>
           <td><strong>${row.paddyType || 'N/A'}</strong></td>
-          <td>${(row.quantity || row.paddyQuantity || 0).toLocaleString()} kg</td>
+          <td>${qty.toLocaleString()} kg</td>
+          <td>Rs. ${price.toLocaleString()}</td>
+          <td><strong>Rs. ${cost.toLocaleString()}</strong></td>
           <td>${row.moistureLevel || 'N/A'}%</td>
           <td>${row.warehouse || 'N/A'}</td>
           <td>${row.supplier || row.supplierName || 'N/A'}</td>
           <td>${row.user || 'N/A'}</td>
           <td>${row.date ? new Date(row.date).toLocaleDateString() : 'N/A'}</td>
         </tr>
-      `).join('');
+      `}).join('');
       totalQuantity = reportData.reduce((sum, item) => sum + (item.quantity || item.paddyQuantity || 0), 0);
-      totalAmount = 0;
+      totalAmount = reportData.reduce((sum, item) => {
+        const qty = item.quantity || item.paddyQuantity || 0;
+        const price = item.pricePerKg || 0;
+        return sum + (item.totalAmount || item.totalPrice || (qty * price) || 0);
+      }, 0);
     } else if (isRiceSale) {
       tableHeaders = ['#', 'Rice Type', 'Quantity', 'Price/kg', 'Total Amount', 'Customer', 'Mobile', 'Date'];
       tableRows = reportData.map((row, index) => `
@@ -404,22 +414,30 @@ const Reports = () => {
       totalAmount = reportData.reduce((sum, item) => sum + (item.totalAmount || item.totalPrice || 0), 0);
     } else {
       // Rice Stock
-      tableHeaders = ['#', 'Rice Type', 'Quantity', 'Price/kg', 'Total Amount', 'Supplier', 'Mobile', 'User', 'Date'];
-      tableRows = reportData.map((row, index) => `
+      tableHeaders = ['#', 'Rice Type', 'Quantity', 'Price/kg', 'Total Cost', 'Supplier', 'Mobile', 'User', 'Date'];
+      tableRows = reportData.map((row, index) => {
+        const qty = row.quantity || row.riceQuantity || 0;
+        const price = row.pricePerKg || 0;
+        const cost = row.totalAmount || row.totalPrice || (qty * price) || 0;
+        return `
         <tr>
           <td>${index + 1}</td>
           <td><strong>${row.riceType || 'N/A'}</strong></td>
-          <td>${(row.quantity || row.riceQuantity || 0).toLocaleString()} kg</td>
-          <td>Rs. ${(row.pricePerKg || 0).toLocaleString()}</td>
-          <td><strong>Rs. ${(row.totalAmount || row.totalPrice || 0).toLocaleString()}</strong></td>
+          <td>${qty.toLocaleString()} kg</td>
+          <td>Rs. ${price.toLocaleString()}</td>
+          <td><strong>Rs. ${cost.toLocaleString()}</strong></td>
           <td>${row.supplierName || row.supplier || 'N/A'}</td>
           <td>${row.mobileNumber || 'N/A'}</td>
           <td>${row.user || 'N/A'}</td>
           <td>${row.date ? new Date(row.date).toLocaleDateString() : 'N/A'}</td>
         </tr>
-      `).join('');
+      `}).join('');
       totalQuantity = reportData.reduce((sum, item) => sum + (item.quantity || item.riceQuantity || 0), 0);
-      totalAmount = reportData.reduce((sum, item) => sum + (item.totalAmount || item.totalPrice || 0), 0);
+      totalAmount = reportData.reduce((sum, item) => {
+        const qty = item.quantity || item.riceQuantity || 0;
+        const price = item.pricePerKg || 0;
+        return sum + (item.totalAmount || item.totalPrice || (qty * price) || 0);
+      }, 0);
     }
 
     // Calculate additional summaries based on report type
@@ -446,11 +464,27 @@ const Reports = () => {
           <div class="summary-value" style="font-size: 14px;">${isPaddyReport ? 'Paddy Sale' : 'Rice Sale'}</div>
         </div>
       `;
-    } else {
+    } else if (isPaddyStock) {
       additionalSummary = `
+        <div class="summary-card orange">
+          <div class="summary-label">Paddy Get Cost</div>
+          <div class="summary-value">Rs. ${totalAmount.toLocaleString()}</div>
+        </div>
         <div class="summary-card purple">
           <div class="summary-label">Report Type</div>
-          <div class="summary-value" style="font-size: 14px;">${isPaddyReport ? 'Paddy Stock' : 'Rice Stock'}</div>
+          <div class="summary-value" style="font-size: 14px;">Paddy Stock</div>
+        </div>
+      `;
+    } else {
+      // Rice Stock
+      additionalSummary = `
+        <div class="summary-card orange">
+          <div class="summary-label">Rice Get Cost</div>
+          <div class="summary-value">Rs. ${totalAmount.toLocaleString()}</div>
+        </div>
+        <div class="summary-card purple">
+          <div class="summary-label">Report Type</div>
+          <div class="summary-value" style="font-size: 14px;">Rice Stock</div>
         </div>
       `;
     }
@@ -953,15 +987,45 @@ const Reports = () => {
 
       {/* Additional Stock Info Cards */}
       {filteredSystemData && filteredSystemData.summary && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
+          {/* Paddy Get Cost - Yellow/Amber Box */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-500/10 dark:to-yellow-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl p-4"
+          >
+            <div className="flex flex-col gap-1">
+              <span className="text-amber-700 dark:text-amber-400 font-medium text-sm">Paddy Get Cost</span>
+              <span className="text-amber-800 dark:text-amber-300 text-xl font-bold">
+                Rs. {(filteredSystemData.summary?.totalPaddyStockCost || 0).toLocaleString()}
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Rice Get Cost - Indigo Box */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.05 }}
+            className="bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-500/10 dark:to-violet-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-xl p-4"
+          >
+            <div className="flex flex-col gap-1">
+              <span className="text-indigo-700 dark:text-indigo-400 font-medium text-sm">Rice Get Cost</span>
+              <span className="text-indigo-800 dark:text-indigo-300 text-xl font-bold">
+                Rs. {(filteredSystemData.summary?.totalRiceStockCost || 0).toLocaleString()}
+              </span>
+            </div>
+          </motion.div>
+
           {/* Broken Rice - Green Box */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
             className="bg-[#2E7D32]/10 border border-[#2E7D32]/20 dark:bg-green-500/10 dark:border-green-500/20 rounded-xl p-4"
           >
-            <div className="flex justify-between items-center">
-              <span className="text-[#2E7D32] dark:text-green-400 font-medium">Total Broken Rice:</span>
+            <div className="flex flex-col gap-1">
+              <span className="text-[#2E7D32] dark:text-green-400 font-medium text-sm">Total Broken Rice</span>
               <span className="text-[#2E7D32] dark:text-green-400 text-xl font-bold">
                 {(filteredSystemData.summary?.totalBrokenRice || 0).toLocaleString()} kg
               </span>
@@ -972,11 +1036,11 @@ const Reports = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0.15 }}
             className="bg-[#2E7D32]/10 border border-[#2E7D32]/20 dark:bg-green-500/10 dark:border-green-500/20 rounded-xl p-4"
           >
-            <div className="flex justify-between items-center">
-              <span className="text-[#2E7D32] dark:text-green-400 font-medium">Total Polish Rice:</span>
+            <div className="flex flex-col gap-1">
+              <span className="text-[#2E7D32] dark:text-green-400 font-medium text-sm">Total Polish Rice</span>
               <span className="text-[#2E7D32] dark:text-green-400 text-xl font-bold">
                 {(filteredSystemData.summary?.totalPolishRice || 0).toLocaleString()} kg
               </span>
@@ -990,8 +1054,8 @@ const Reports = () => {
             transition={{ delay: 0.2 }}
             className="bg-[#2E7D32]/10 border border-[#2E7D32]/20 dark:bg-green-500/10 dark:border-green-500/20 rounded-xl p-4"
           >
-            <div className="flex justify-between items-center">
-              <span className="text-[#2E7D32] dark:text-green-400 font-medium">Total Revenue:</span>
+            <div className="flex flex-col gap-1">
+              <span className="text-[#2E7D32] dark:text-green-400 font-medium text-sm">Total Revenue</span>
               <span className="text-[#2E7D32] dark:text-green-400 text-xl font-bold">
                 Rs. {((filteredSystemData.summary?.totalPaddySales || 0) + (filteredSystemData.summary?.totalRiceSales || 0)).toLocaleString()}
               </span>

@@ -25,19 +25,14 @@ export const reportsService = {
       return { data: {} };
     }
 
-    // If no date filters, return all data
-    if (!fromDate && !toDate) {
-      return axiosInstance.get('/reports/all-system-data');
-    }
-
     try {
-      // Fetch all report types with date filter
+      // Always fetch from stock APIs to calculate costs
       const [paddyStock, paddySale, paddyThreshing, riceStock, riceSale] = await Promise.all([
-        reportsService.generateReport({ fromDate, toDate, reportType: 'PADDY_STOCK' }),
-        reportsService.generateReport({ fromDate, toDate, reportType: 'PADDY_SALE' }),
-        reportsService.generateReport({ fromDate, toDate, reportType: 'PADDY_THRESHING' }),
-        reportsService.generateReport({ fromDate, toDate, reportType: 'RICE_STOCK' }),
-        reportsService.generateReport({ fromDate, toDate, reportType: 'RICE_SALE' })
+        reportsService.generateReport({ fromDate: fromDate || null, toDate: toDate || null, reportType: 'PADDY_STOCK' }),
+        reportsService.generateReport({ fromDate: fromDate || null, toDate: toDate || null, reportType: 'PADDY_SALE' }),
+        reportsService.generateReport({ fromDate: fromDate || null, toDate: toDate || null, reportType: 'PADDY_THRESHING' }),
+        reportsService.generateReport({ fromDate: fromDate || null, toDate: toDate || null, reportType: 'RICE_STOCK' }),
+        reportsService.generateReport({ fromDate: fromDate || null, toDate: toDate || null, reportType: 'RICE_SALE' })
       ]);
 
       // Calculate summary from filtered data
@@ -50,24 +45,35 @@ export const reportsService = {
 
       // Process paddy stock
       const paddyData = {};
+      let totalPaddyStockCost = 0;
       (paddyStock.data || []).forEach(item => {
         const type = item.paddyType || 'Unknown';
         if (!paddyData[type]) {
-          paddyData[type] = { totalStock: 0, totalSales: 0, totalRevenue: 0 };
+          paddyData[type] = { totalStock: 0, totalSales: 0, totalRevenue: 0, totalCost: 0 };
         }
-        paddyData[type].totalStock += item.quantity || item.paddyQuantity || 0;
-        totalPaddyStock += item.quantity || item.paddyQuantity || 0;
+        const quantity = item.quantity || item.paddyQuantity || 0;
+        const pricePerKg = item.pricePerKg || 0;
+        const cost = item.totalAmount || item.totalPrice || (quantity * pricePerKg) || 0;
+
+        paddyData[type].totalStock += quantity;
+        paddyData[type].totalCost += cost;
+        totalPaddyStock += quantity;
+        totalPaddyStockCost += cost;
       });
 
       // Process paddy sales
       (paddySale.data || []).forEach(item => {
         const type = item.paddyType || 'Unknown';
         if (!paddyData[type]) {
-          paddyData[type] = { totalStock: 0, totalSales: 0, totalRevenue: 0 };
+          paddyData[type] = { totalStock: 0, totalSales: 0, totalRevenue: 0, totalCost: 0 };
         }
-        paddyData[type].totalSales += item.quantity || 0;
-        paddyData[type].totalRevenue += item.totalAmount || item.totalPrice || 0;
-        totalPaddySales += item.totalAmount || item.totalPrice || 0;
+        const quantity = item.quantity || item.paddyQuantity || 0;
+        const pricePerKg = item.pricePerKg || 0;
+        const amount = item.totalAmount || item.totalPrice || (quantity * pricePerKg) || 0;
+
+        paddyData[type].totalSales += quantity;
+        paddyData[type].totalRevenue += amount;
+        totalPaddySales += amount;
       });
 
       // Process threshing
@@ -80,23 +86,34 @@ export const reportsService = {
 
       // Process rice stock
       const riceData = {};
+      let totalRiceStockCost = 0;
       (riceStock.data || []).forEach(item => {
         const type = item.riceType || 'Unknown';
         if (!riceData[type]) {
-          riceData[type] = { totalStock: 0, totalSales: 0, totalRevenue: 0, totalBrokenRice: 0, totalPolishRice: 0 };
+          riceData[type] = { totalStock: 0, totalSales: 0, totalRevenue: 0, totalBrokenRice: 0, totalPolishRice: 0, totalCost: 0 };
         }
-        riceData[type].totalStock += item.quantity || item.riceQuantity || 0;
+        const quantity = item.quantity || item.riceQuantity || 0;
+        const pricePerKg = item.pricePerKg || 0;
+        const cost = item.totalAmount || item.totalPrice || (quantity * pricePerKg) || 0;
+
+        riceData[type].totalStock += quantity;
+        riceData[type].totalCost += cost;
+        totalRiceStockCost += cost;
       });
 
       // Process rice sales
       (riceSale.data || []).forEach(item => {
         const type = item.riceType || 'Unknown';
         if (!riceData[type]) {
-          riceData[type] = { totalStock: 0, totalSales: 0, totalRevenue: 0, totalBrokenRice: 0, totalPolishRice: 0 };
+          riceData[type] = { totalStock: 0, totalSales: 0, totalRevenue: 0, totalBrokenRice: 0, totalPolishRice: 0, totalCost: 0 };
         }
-        riceData[type].totalSales += item.quantity || 0;
-        riceData[type].totalRevenue += item.totalAmount || item.totalPrice || 0;
-        totalRiceSales += item.totalAmount || item.totalPrice || 0;
+        const quantity = item.quantity || item.riceQuantity || 0;
+        const pricePerKg = item.pricePerKg || 0;
+        const amount = item.totalAmount || item.totalPrice || (quantity * pricePerKg) || 0;
+
+        riceData[type].totalSales += quantity;
+        riceData[type].totalRevenue += amount;
+        totalRiceSales += amount;
       });
 
       return {
@@ -107,7 +124,9 @@ export const reportsService = {
             totalBrokenRice,
             totalPolishRice,
             totalPaddySales,
-            totalRiceSales
+            totalRiceSales,
+            totalPaddyStockCost,
+            totalRiceStockCost
           },
           paddyData,
           riceData,
