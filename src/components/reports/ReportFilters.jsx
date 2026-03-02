@@ -486,6 +486,11 @@ const ReportFilters = ({
                           }
                           value={isSupplierDropdownOpen ? supplierSearchTerm : (filters.supplier || '')}
                           readOnly={!isSupplierDropdownOpen && !!filters.supplier}
+                          placeholder={
+                            (filters.reportType === REPORT_TYPES.PADDY_SALE || filters.reportType === REPORT_TYPES.RICE_SALE)
+                              ? 'All Customers'
+                              : 'All Suppliers'
+                          }
                           onChange={(e) => {
                             setSupplierSearchTerm(e.target.value);
                             setIsSupplierDropdownOpen(true);
