@@ -1,6 +1,11 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # Proxy API requests to backend server (requires mod_proxy enabled on Hostinger)
+  # RewriteRule ^api/(.*)$ http://187.124.98.120:8081/api/$1 [P,L]
+
+  # SPA fallback - serve index.html for all non-file routes
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
