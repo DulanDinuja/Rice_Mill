@@ -2,14 +2,18 @@
   RewriteEngine On
   RewriteBase /
 
-  # Proxy API requests to backend server (requires mod_proxy enabled on Hostinger)
-  # RewriteRule ^api/(.*)$ http://187.124.98.120:8081/api/$1 [P,L]
+  # Proxy API requests through PHP proxy
+  # This handles HTTPS -> HTTP backend communication
+  RewriteCond %{REQUEST_URI} ^/api/(.*)$
+  RewriteRule ^api/(.*)$ /proxy.php?endpoint=$1 [QSA,L]
 
   # SPA fallback - serve index.html for all non-file routes
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteCond %{REQUEST_URI} !^/api/
+  RewriteCond %{REQUEST_URI} !^/proxy\.php
   RewriteRule . /index.html [L]
 </IfModule>
 
