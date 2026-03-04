@@ -6,7 +6,7 @@
  */
 
 // Backend API URL
-$BACKEND_URL = 'http://187.124.98.120:8081/api';
+$BACKEND_URL = 'https://sameerarice.cloud/api';
 
 // Set CORS headers
 header('Access-Control-Allow-Origin: *');
