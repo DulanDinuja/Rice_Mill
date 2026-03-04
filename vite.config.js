@@ -8,7 +8,7 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'http://187.124.98.120:8081',
+        target: 'https://sameerarice.cloud',
         changeOrigin: true,
         secure: false,
       }

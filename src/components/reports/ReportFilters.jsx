@@ -481,16 +481,11 @@ const ReportFilters = ({
                           type="text"
                           placeholder={
                             (filters.reportType === REPORT_TYPES.PADDY_SALE || filters.reportType === REPORT_TYPES.RICE_SALE)
-                              ? 'Search customer by name or NIC...'
-                              : 'Search supplier by name or NIC...'
-                          }
-                          value={isSupplierDropdownOpen ? supplierSearchTerm : (filters.supplier || '')}
-                          readOnly={!isSupplierDropdownOpen && !!filters.supplier}
-                          placeholder={
-                            (filters.reportType === REPORT_TYPES.PADDY_SALE || filters.reportType === REPORT_TYPES.RICE_SALE)
                               ? 'All Customers'
                               : 'All Suppliers'
                           }
+                          value={isSupplierDropdownOpen ? supplierSearchTerm : (filters.supplier || '')}
+                          readOnly={!isSupplierDropdownOpen && !!filters.supplier}
                           onChange={(e) => {
                             setSupplierSearchTerm(e.target.value);
                             setIsSupplierDropdownOpen(true);

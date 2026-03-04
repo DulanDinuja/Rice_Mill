@@ -1,4 +1,4 @@
-const BACKEND = 'http://187.124.98.120:8081';
+const BACKEND = 'https://sameerarice.cloud';
 const ALLOWED_ORIGIN = 'https://sameerarice.cloud';
 
 const corsHeaders = {
